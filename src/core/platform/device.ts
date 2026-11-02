@@ -23,13 +23,17 @@ export type Layout = {
 /** Telefon: kısa kenar bu değerin altında ya da genişlik bu değerin altında. */
 const COMPACT_SHORT_SIDE = 500;
 const COMPACT_WIDTH = 820;
+/** Telefon sayılabilecek en uzun kenar (px) */
+const PHONE_MAX_LONG_SIDE = 1000;
 
 export function computeLayout(info: DeviceInfo): Layout {
   const short = Math.min(info.width, info.height);
   return {
     isTouch:
       info.coarsePointer ||
-      (info.maxTouchPoints > 0 && (info.hoverNone === true || short <= COMPACT_SHORT_SIDE)),
+      (info.maxTouchPoints > 0 && (info.hoverNone === true || short <= COMPACT_SHORT_SIDE)) ||
+      // Telefon boyutlu ekran: tarayıcı dokunmatik demese de (örn. "masaüstü sitesi" modu)
+      (short <= COMPACT_SHORT_SIDE && info.width <= PHONE_MAX_LONG_SIDE),
     isCompact: short <= COMPACT_SHORT_SIDE || info.width <= COMPACT_WIDTH,
     isPortrait: info.width < info.height,
   };
@@ -49,7 +53,26 @@ export function readDevice(): DeviceInfo {
   };
 }
 
-export const currentLayout = (): Layout => computeLayout(readDevice());
+/** Gerçek bir dokunma görüldü mü (algıya ek güvenlik ağı): küçük/orta ekranda dokunmatik kabul edilir */
+let touchSeen = false;
+const LAYOUT_EVENT = 'mg-layout';
+if (typeof window !== 'undefined')
+  window.addEventListener(
+    'touchstart',
+    () => {
+      if (touchSeen) return;
+      touchSeen = true;
+      window.dispatchEvent(new Event(LAYOUT_EVENT));
+    },
+    { passive: true },
+  );
+
+export function currentLayout(): Layout {
+  const info = readDevice();
+  const layout = computeLayout(info);
+  if (touchSeen && Math.min(info.width, info.height) <= 900) layout.isTouch = true;
+  return layout;
+}
 
 // useSyncExternalStore kararlı bir anlık görüntü ister: değer değişmedikçe aynı nesne döner.
 let cached: Layout = currentLayout();
@@ -67,9 +90,11 @@ function snapshot(): Layout {
 function subscribe(onChange: () => void): () => void {
   window.addEventListener('resize', onChange);
   window.addEventListener('orientationchange', onChange);
+  window.addEventListener(LAYOUT_EVENT, onChange);
   return () => {
     window.removeEventListener('resize', onChange);
     window.removeEventListener('orientationchange', onChange);
+    window.removeEventListener(LAYOUT_EVENT, onChange);
   };
 }
 

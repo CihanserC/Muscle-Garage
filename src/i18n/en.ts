@@ -400,6 +400,7 @@ export const en: Record<string, string> = {
   'settings.controls': 'Controls',
   'ui.expand': 'Show panel',
   'ui.collapse': 'Hide panel',
+  'settings.version': 'Build',
   'settings.hudScale': 'HUD size',
   'settings.lamps': 'Indicator lamps (ABS/TC/HB/drift)',
   'settings.ghost': 'Best-lap ghost',

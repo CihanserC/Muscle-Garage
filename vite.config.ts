@@ -24,6 +24,8 @@ export default defineConfig({
   // GitHub Pages alt yolda yayınlar (/<depo>/); yerelde ve testte kök
   base: process.env.BASE_PATH ?? '/',
   plugins: [react()],
+  // Ayarlar'da gösterilen derleme zamanı: yayının güncel olup olmadığı anlaşılsın
+  define: { __BUILD_ID__: JSON.stringify(new Date().toISOString().slice(0, 16).replace('T', ' ')) },
   build: {
     rolldownOptions: {
       output: { codeSplitting: { groups: vendorGroups } },

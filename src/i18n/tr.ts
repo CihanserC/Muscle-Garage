@@ -401,6 +401,7 @@ export const tr: Record<string, string> = {
   'settings.controls': 'Kontroller',
   'ui.expand': 'Paneli aç',
   'ui.collapse': 'Paneli gizle',
+  'settings.version': 'Sürüm',
   'settings.hudScale': 'HUD boyutu',
   'settings.lamps': 'Gösterge lambaları (ABS/TC/EF/drift)',
   'settings.ghost': 'En iyi tur hayaleti',

@@ -154,6 +154,11 @@ function useRows(): Row[] {
         ]
       : []),
     {
+      id: 'build',
+      label: t('settings.version'),
+      value: typeof __BUILD_ID__ === 'string' ? __BUILD_ID__ : 'dev',
+    },
+    {
       id: 'credits',
       label: t('ui.credits'),
       value: '›',

@@ -1,5 +1,6 @@
 import { useEffect, useRef, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react';
 import { steerFromPointer } from '../../core/input/touch';
+import { useAppStore } from '../../core/store/appStore';
 import { useDriveStore } from '../../core/store/driveStore';
 import { t } from '../../i18n';
 import { calibrateGyro, syncGyro } from '../gyroInput';
@@ -120,6 +121,18 @@ export function TouchControls() {
           onClick={() => useDriveStore.getState().escape()}
         >
           ❚❚
+        </button>
+        <button
+          type="button"
+          className="tc-small"
+          aria-label={t('settings.title')}
+          onClick={() => {
+            // Ayarlar açılırken oyun durur
+            useDriveStore.getState().setPaused(true);
+            useAppStore.getState().setSettingsOpen(true);
+          }}
+        >
+          ⚙
         </button>
         <button
           type="button"

@@ -85,3 +85,26 @@ describe('fitFov', () => {
     expect(fitFov(40, 1.3)).toBeLessThan(fitFov(40, 0.8));
   });
 });
+
+describe('telefon boyutlu ekran', () => {
+  it('tarayıcı dokunmatik demese de telefon boyutu (masaüstü site modu) dokunmatik sayılır', () => {
+    const info = {
+      coarsePointer: false,
+      hoverNone: false,
+      maxTouchPoints: 0,
+      width: 980,
+      height: 460,
+    };
+    expect(computeLayout(info).isTouch).toBe(true);
+  });
+  it('geniş masaüstü penceresi dokunmatik sayılmaz', () => {
+    const info = {
+      coarsePointer: false,
+      hoverNone: false,
+      maxTouchPoints: 0,
+      width: 1400,
+      height: 450,
+    };
+    expect(computeLayout(info).isTouch).toBe(false);
+  });
+});
