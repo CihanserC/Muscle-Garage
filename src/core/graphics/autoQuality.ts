@@ -4,6 +4,9 @@ import { QUALITY_LEVELS, type QualityLevel } from '../store/graphicsStore';
 export const LOW_FPS = 42;
 /** Art arda bu kadar yavaş ölçümden sonra kalite bir kademe düşer (ölçüm aralığı ≈ 0,5 sn). */
 export const SLOW_SAMPLES = 4;
+/** Dokunmatik cihazlarda daha erken ve daha çabuk düşer: batarya/ısınma ve sürüş akıcılığı */
+export const TOUCH_LOW_FPS = 50;
+export const TOUCH_SLOW_SAMPLES = 3;
 /** Başlangıçta ve her kalite değişiminden sonra yok sayılan süre (sn): shader derlemesi / ısınma */
 export const WARMUP_SECONDS = 6;
 
@@ -28,13 +31,15 @@ export function lowerQuality(level: QualityLevel): QualityLevel {
  */
 export function stepAutoQuality(
   state: AutoQualityState,
-  input: { fps: number; dt: number; quality: QualityLevel; active: boolean },
+  input: { fps: number; dt: number; quality: QualityLevel; active: boolean; touch?: boolean },
 ): { state: AutoQualityState; lowerTo: QualityLevel | null } {
   if (!input.active || input.fps <= 0) return { state: { ...state, slow: 0 }, lowerTo: null };
   if (state.warmup > 0)
     return { state: { slow: 0, warmup: Math.max(0, state.warmup - input.dt) }, lowerTo: null };
-  const slow = input.fps < LOW_FPS ? state.slow + 1 : 0;
-  if (slow >= SLOW_SAMPLES && input.quality !== 'low')
+  const lowFps = input.touch ? TOUCH_LOW_FPS : LOW_FPS;
+  const needed = input.touch ? TOUCH_SLOW_SAMPLES : SLOW_SAMPLES;
+  const slow = input.fps < lowFps ? state.slow + 1 : 0;
+  if (slow >= needed && input.quality !== 'low')
     return {
       state: { slow: 0, warmup: WARMUP_SECONDS },
       lowerTo: lowerQuality(input.quality),

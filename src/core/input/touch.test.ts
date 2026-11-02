@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { steerFromPointer, touchBrakeToDrift } from './touch';
+import { steerFromPointer, swipeDirection, touchBrakeToDrift } from './touch';
 
 describe('steerFromPointer', () => {
   it('ortada düz', () => {
@@ -39,5 +39,17 @@ describe('touchBrakeToDrift', () => {
   it('fren yoksa dokunmaz', () => {
     const idle = { ...braking, brake: 0 };
     expect(touchBrakeToDrift(idle, 20)).toEqual(idle);
+  });
+});
+
+describe('swipeDirection', () => {
+  it('sola kaydırma sonraki, sağa kaydırma önceki', () => {
+    expect(swipeDirection(-120, 5)).toBe(1);
+    expect(swipeDirection(120, -5)).toBe(-1);
+  });
+  it('kısa ya da dikey hareket kaydırma sayılmaz', () => {
+    expect(swipeDirection(-30, 0)).toBe(0);
+    expect(swipeDirection(-100, 90)).toBe(0);
+    expect(swipeDirection(0, 200)).toBe(0);
   });
 });

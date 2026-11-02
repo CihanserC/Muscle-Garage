@@ -24,3 +24,15 @@ export function touchBrakeToDrift(input: DriveInput, speed: number): DriveInput 
   if (input.brake <= 0 || !isDrifting(true, input.steer, speed)) return input;
   return { ...input, brake: 0, handbrake: true };
 }
+
+/** Kaydırma sayılması için asgari yatay mesafe (px) */
+export const SWIPE_MIN_DISTANCE = 60;
+
+/**
+ * Yatay kaydırma yönü: sola kaydırma → +1 (sonraki), sağa → -1 (önceki). Yeterince uzun ve
+ * belirgin biçimde yataysa; aksi halde 0 (dikey kaydırma / dokunma).
+ */
+export function swipeDirection(dx: number, dy: number): -1 | 0 | 1 {
+  if (Math.abs(dx) < SWIPE_MIN_DISTANCE || Math.abs(dx) < Math.abs(dy) * 2) return 0;
+  return dx < 0 ? 1 : -1;
+}

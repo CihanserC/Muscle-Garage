@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { playUiSound } from '../../../audio/uiSound';
 import { createDefaultBuild } from '../../../core/build/build';
+import { swipeDirection } from '../../../core/input/touch';
 import { buildStats, statFraction, type BuildStats } from '../../../core/performance/performance';
 import { enterCar, previewCar } from '../../../core/store/carSession';
 import { useGarageStore } from '../../../core/store/garageStore';
@@ -61,6 +62,27 @@ export function CarSelect() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
+  });
+
+  // Dokunmatik: vitrinde (3B alan) yatay kaydırma aracı değiştirir
+  useEffect(() => {
+    let start: { x: number; y: number; id: number } | null = null;
+    const onDown = (e: PointerEvent) => {
+      if (e.pointerType !== 'touch' || !(e.target instanceof HTMLCanvasElement)) return;
+      start = { x: e.clientX, y: e.clientY, id: e.pointerId };
+    };
+    const onUp = (e: PointerEvent) => {
+      if (!start || start.id !== e.pointerId) return;
+      const dir = swipeDirection(e.clientX - start.x, e.clientY - start.y);
+      start = null;
+      if (dir !== 0) go(dir);
+    };
+    window.addEventListener('pointerdown', onDown);
+    window.addEventListener('pointerup', onUp);
+    return () => {
+      window.removeEventListener('pointerdown', onDown);
+      window.removeEventListener('pointerup', onUp);
+    };
   });
 
   const saved = autosaves[car.manifest.id];

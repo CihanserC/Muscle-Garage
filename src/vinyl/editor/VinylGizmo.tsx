@@ -28,6 +28,7 @@ import {
   type ProjectionBox,
 } from '../../core/vinyl/projection';
 import type { VinylLayer, VinylSide } from '../../core/vinyl/types';
+import { currentLayout } from '../../core/platform/device';
 import { useAppStore } from '../../core/store/appStore';
 import { useBuildStore } from '../../core/store/stores';
 import { categoryKind } from '../../garage/ui/categories';
@@ -45,6 +46,11 @@ const GIZMO = {
   rotateOffsetRatio: 0.05,
   renderOrder: 1000,
 };
+
+/** Parmakla tutulabilsin diye dokunmatik cihazlarda tutamaklar bu kat büyür */
+const TOUCH_HANDLE_SCALE = 2;
+const handleRatio = (): number =>
+  GIZMO.handleScreenRatio * (currentLayout().isTouch ? TOUCH_HANDLE_SCALE : 1);
 
 type OrbitLike = { enabled: boolean };
 
@@ -407,7 +413,7 @@ function Handle({
     const m = ref.current;
     if (!m) return;
     const world = m.getWorldPosition(new Vector3());
-    m.scale.setScalar(camera.position.distanceTo(world) * GIZMO.handleScreenRatio);
+    m.scale.setScalar(camera.position.distanceTo(world) * handleRatio());
   });
   return (
     <mesh ref={ref} position={at} renderOrder={GIZMO.renderOrder + 1} onPointerDown={onDown}>
@@ -427,7 +433,7 @@ function RotateHandle({ base, dir, onDown }: { base: Vector3; dir: Vector3; onDo
     if (!g || !k) return;
     const d = camera.position.distanceTo(g.getWorldPosition(new Vector3()));
     k.position.copy(dir).multiplyScalar(d * GIZMO.rotateOffsetRatio);
-    k.scale.setScalar(d * GIZMO.handleScreenRatio * 1.2);
+    k.scale.setScalar(d * handleRatio() * 1.2);
   });
   return (
     <group ref={ref} position={base}>

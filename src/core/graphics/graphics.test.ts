@@ -96,3 +96,27 @@ describe('grafik ayarları', () => {
     expect(qualityPresets.ultra.ao).not.toBeNull();
   });
 });
+
+describe('uyarlanabilir kalite: dokunmatik', () => {
+  it('46 FPS masaüstünde yavaş sayılmaz, dokunmatikte sayılır ve daha çabuk düşürür', () => {
+    let desktop = initialAutoQuality();
+    desktop = { ...desktop, warmup: 0 };
+    let touch = { ...desktop };
+    let lowered: string | null = null;
+    for (let i = 0; i < 3; i++) {
+      const d = stepAutoQuality(desktop, { fps: 46, dt: 0.5, quality: 'high', active: true });
+      desktop = d.state;
+      expect(d.lowerTo).toBeNull();
+      const t = stepAutoQuality(touch, {
+        fps: 46,
+        dt: 0.5,
+        quality: 'high',
+        active: true,
+        touch: true,
+      });
+      touch = t.state;
+      lowered = t.lowerTo ?? lowered;
+    }
+    expect(lowered).toBe('medium');
+  });
+});

@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { initialAutoQuality, stepAutoQuality } from '../core/graphics/autoQuality';
+import { currentLayout } from '../core/platform/device';
 import { useAppStore } from '../core/store/appStore';
 import { useDriveStore } from '../core/store/driveStore';
 import { useGraphicsStore } from '../core/store/graphicsStore';
@@ -27,6 +28,7 @@ export function AutoQuality() {
         fps: graphics.fps,
         dt,
         quality: graphics.quality,
+        touch: currentLayout().isTouch,
         active: document.visibilityState === 'visible' && !paused && !usePhotoStore.getState().busy,
       });
       state = result.state;
