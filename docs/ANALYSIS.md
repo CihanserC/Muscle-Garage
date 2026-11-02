@@ -62,6 +62,10 @@ Kabul ölçütleri (`npm run lint`, `npm test`, `npm run build`): hepsi yeşil �
 
 - İlk gerçek telefon testinde arayüzün masaüstü ölçüsünde olduğu görüldü: ölçek katmanı, kadraj uyumu, daha sağlam dokunmatik algısı, katlanır atölye paneli ve büyütülmüş dokunmatik kontroller eklendi. **Henüz telefonda yeniden doğrulanmadı.** Testler: 492.
 
+## 1h. Güncelleme (2026-11-02, telefon testi 2)
+
+- Telefon boyutlu ekranlar artık dokunmatik sayılıyor ve gerçek dokunma görülünce dokunmatik mod kalıcı açılıyor; sürüşte ayarlar düğmesi ve Ayarlar'da sürüm damgası var. **Telefonda yeniden doğrulanmadı.** Testler: 494.
+
 ## 2. Mimari
 
 - **Veri odaklı:** araç manifesti, parça kataloğu, boya/jant/duruş/performans/pist verileri JSON; kodda sihirli sayı yok (görsel ayarlar `sceneConfig`, `materialConfig`, fizik sabitleri adlandırılmış sabitlerde).
