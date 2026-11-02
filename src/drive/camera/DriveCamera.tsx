@@ -6,6 +6,7 @@ import {
   useDriveStore,
   type DriveCamera as Mode,
 } from '../../core/store/driveStore';
+import { useBuildStore } from '../../core/store/stores';
 import { sceneConfig } from '../../garage/scene/sceneConfig';
 import type { VehicleSnapshot } from '../physics/VehiclePhysics';
 
@@ -25,9 +26,25 @@ const CAMERA_CONFIG: Record<
   chase_low: { distance: 5.2, height: 1.15, lookAhead: 6, lookHeight: 0.8, fov: 62, fovSpeed: 6 },
   hood: { distance: 0, height: 0, lookAhead: 20, lookHeight: 0, fov: 72, fovSpeed: 8 },
   bumper: { distance: 0, height: 0, lookAhead: 20, lookHeight: 0, fov: 78, fovSpeed: 8 },
+  cockpit: { distance: 0, height: 0, lookAhead: 20, lookHeight: 0, fov: 74, fovSpeed: 7 },
 };
 /** Kaput / tampon kamerası konumları, zemin hizalı araç uzayında (m) */
 const MOUNTS = { hood: { y: 1.12, z: 0.55 }, bumper: { y: 0.42, zExtra: 0.25 } };
+/**
+ * Kokpit kamerası: sürücü gözü, zemin hizalı araç uzayında (m; x sol +). Araç başına yaklaşık
+ * değerler (Vanta iç mekânı koltuğuna göre; Mustang/BMW gerçek modelleri için tahmin).
+ */
+const COCKPIT_EYE: Record<string, { x: number; y: number; z: number }> = {
+  vanta_stallion_70: { x: 0.38, y: 1.08, z: -0.12 },
+  ford_mustang_gt_2013: { x: 0.37, y: 1.14, z: -0.05 },
+  bmw_m3_gtr_2001: { x: 0.36, y: 1.1, z: -0.05 },
+};
+const DEFAULT_EYE = { x: 0.37, y: 1.1, z: -0.08 };
+/** Yanal hıza bağlı baş sallanması (m / m·s⁻¹) ve sınırı (m) */
+const HEAD_SWAY = 0.006;
+const HEAD_SWAY_MAX = 0.06;
+/** Kokpit kamerasında yakın kırpma düzlemi (m): iç mekân parçaları kesilmesin */
+const COCKPIT_NEAR = 0.05;
 const TOP_SPEED_FOR_FOV = 70;
 /** Dikey takip hızı (1/sn): süspansiyon sekmesi kameraya birebir geçmesin */
 const FOLLOW_RATE = 6;
@@ -60,6 +77,7 @@ export function DriveCamera({
   });
   const first = useRef(true);
   const index = useDriveStore((s) => s.cameraIndex);
+  const carId = useBuildStore((s) => s.build.carId);
 
   useEffect(() => {
     const camera = store.getState().camera as PerspectiveCamera;
@@ -99,7 +117,25 @@ export function DriveCamera({
     const p = g.position;
     const speed = snapshotRef.current?.speed ?? 0;
 
-    if (mode === 'hood' || mode === 'bumper') {
+    const near = mode === 'cockpit' ? COCKPIT_NEAR : 0.2;
+    if (camera.near !== near) {
+      camera.near = near;
+      camera.updateProjectionMatrix();
+    }
+
+    if (mode === 'cockpit') {
+      const eye = COCKPIT_EYE[carId] ?? DEFAULT_EYE;
+      const sway = Math.max(
+        -HEAD_SWAY_MAX,
+        Math.min(HEAD_SWAY_MAX, -(snapshotRef.current?.lateralSpeed ?? 0) * HEAD_SWAY),
+      );
+      desired
+        .set(eye.x + sway, eye.y - restHeight, eye.z)
+        .applyQuaternion(quat)
+        .add(p);
+      camera.position.copy(desired);
+      look.copy(forward).multiplyScalar(cfg.lookAhead).add(desired);
+    } else if (mode === 'hood' || mode === 'bumper') {
       const mount =
         mode === 'hood'
           ? { y: MOUNTS.hood.y - restHeight, z: MOUNTS.hood.z }

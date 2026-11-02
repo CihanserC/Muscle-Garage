@@ -303,6 +303,7 @@ export function DriveCar({
           Math.abs(snap.forwardSpeed) > 5
             ? (Math.atan2(Math.abs(snap.lateralSpeed), Math.abs(snap.forwardSpeed)) * 180) / Math.PI
             : 0,
+        steerRad: snap.wheels[0]?.steer ?? 0,
         absActive: assistFlags.current.abs,
         tcActive: assistFlags.current.tc,
         lapDelta: lap.current.running

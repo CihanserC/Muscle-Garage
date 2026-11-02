@@ -4,6 +4,7 @@ import type { Vec3 } from '../../core/math/tuples';
 import { useCarMaterials } from '../materials/useCarMaterials';
 import { Bar, type SlotProps } from './common';
 import { EXHAUST_LAYOUT, exhaustPipes } from './exhaustTails';
+import { VantaCabin } from '../interior/VantaCabin';
 import { deckPose } from './pose';
 
 /** Egzoz, motor ve iç mekan placeholder ölçüleri (m). */
@@ -235,36 +236,7 @@ export function Interior({ option, car, onModel }: SlotProps) {
       >
         <boxGeometry args={[open.halfWidth * 2, tubDepth, open.zEnd - open.zStart]} />
       </mesh>
-      {[1, -1].map((s) => (
-        <group key={s} position-x={s * i.seatX}>
-          <mesh position={[0, i.seat.y, i.seat.z]} material={m.interior}>
-            <boxGeometry args={[...i.seat.size]} />
-          </mesh>
-          <mesh
-            position={[0, i.back.y, i.back.z]}
-            rotation-x={i.back.recline}
-            material={m.interior}
-          >
-            <boxGeometry args={[...i.back.size]} />
-          </mesh>
-        </group>
-      ))}
-      <mesh position={[0, i.bench.y, i.bench.z]} material={m.interior}>
-        <boxGeometry args={[...i.bench.size]} />
-      </mesh>
-      <mesh position={[0, i.benchBack.y, i.benchBack.z]} material={m.interior}>
-        <boxGeometry args={[...i.benchBack.size]} />
-      </mesh>
-      <mesh position={[0, i.dash.y, i.dash.z]} material={m.interior}>
-        <boxGeometry args={[...i.dash.size]} />
-      </mesh>
-      <mesh
-        position={[i.seatX, i.wheel.y, i.wheel.z]}
-        rotation-x={i.wheel.tilt}
-        material={m.blackTrim}
-      >
-        <torusGeometry args={[i.wheel.radius, 0.015, 8, 32]} />
-      </mesh>
+      <VantaCabin />
 
       {cage}
     </group>

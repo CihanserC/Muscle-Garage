@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import type { LapState } from '../drive/lap';
 import { initialLap } from '../drive/lap';
 
-export const DRIVE_CAMERAS = ['chase', 'chase_low', 'hood', 'bumper'] as const;
+export const DRIVE_CAMERAS = ['chase', 'chase_low', 'hood', 'bumper', 'cockpit'] as const;
 export type DriveCamera = (typeof DRIVE_CAMERAS)[number];
 
 export const TIMES_OF_DAY = ['sunset', 'night'] as const;
@@ -32,6 +32,8 @@ export type DriveHud = {
   throttle: number;
   brake: number;
   handbrake: boolean;
+  /** Ön tekerlek direksiyon açısı (rad, + sol): iç mekân direksiyonu */
+  steerRad: number;
   /** Gövde kayma açısı (derece; düşük hızda 0) */
   driftDeg: number;
   /** ABS / çekiş kontrolü şu an müdahale ediyor */
@@ -89,6 +91,7 @@ export const initialHud = (): DriveHud => ({
   brake: 0,
   handbrake: false,
   driftDeg: 0,
+  steerRad: 0,
   absActive: false,
   tcActive: false,
   lapDelta: null,

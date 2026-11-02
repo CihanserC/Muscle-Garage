@@ -290,6 +290,7 @@ export const tr: Record<string, string> = {
   'driveCamera.chase_low': 'Alçak takip',
   'driveCamera.hood': 'Kaput',
   'driveCamera.bumper': 'Tampon',
+  'driveCamera.cockpit': 'Kokpit',
   'perf.engine': 'Motor',
   'perf.transmission': 'Şanzıman',
   'perf.brakes': 'Fren',
