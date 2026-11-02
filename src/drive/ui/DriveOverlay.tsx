@@ -204,22 +204,6 @@ function NitroGauge() {
   );
 }
 
-/** Gaz / fren çubukları: nitro tüpünün solunda ince dikey çubuklar. */
-function Pedals() {
-  const throttle = useDriveStore((s) => s.hud.throttle);
-  const brake = useDriveStore((s) => s.hud.brake);
-  return (
-    <div className="dv-pedals" aria-hidden>
-      <div className="dv-pedal is-brake">
-        <span style={{ height: `${brake * 100}%` }} />
-      </div>
-      <div className="dv-pedal is-throttle">
-        <span style={{ height: `${throttle * 100}%` }} />
-      </div>
-    </div>
-  );
-}
-
 /** Uyarı lambaları (ABS, TC, el freni) ve kayma açısı. */
 function Lamps() {
   const hud = useDriveStore((s) => s.hud);
@@ -275,7 +259,6 @@ function Hud() {
       </div>
       <Speedometer />
       <NitroGauge />
-      <Pedals />
       {showLamps && <Lamps />}
       {!lap.running && <div className="dv-banner">{t('drive.crossLine')}</div>}
       {hud.offTrack && <div className="dv-banner is-warn">{t('drive.offTrack')}</div>}
