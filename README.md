@@ -146,6 +146,12 @@ Details: [`docs/PLAN_V2.md`](docs/PLAN_V2.md) · [`docs/ANALYSIS.md`](docs/ANALY
 
 ---
 
+## 🤝 Contributing
+
+Contributions are welcome! Start with issues labelled [`good first issue`](https://github.com/CihanserC/NFS-Most-Wanted/labels/good%20first%20issue) or [`help wanted`](https://github.com/CihanserC/NFS-Most-Wanted/labels/help%20wanted), and read [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+---
+
 ## 📄 License & credits
 
 Code and procedural assets belong to this project.

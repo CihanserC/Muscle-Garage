@@ -1,0 +1,25 @@
+name: Bug report
+description: Something is broken or looks wrong
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you expect, and what did you see instead? Screenshots help.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+  - type: input
+    id: device
+    attributes:
+      label: Device and browser
+      placeholder: "e.g. Pixel 8, Chrome 130 / Windows 11, Firefox"
+  - type: input
+    id: build
+    attributes:
+      label: Build stamp
+      description: Shown at the bottom of Settings ("Build").
