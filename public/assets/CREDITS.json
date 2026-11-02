@@ -18,6 +18,78 @@
       "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
       "usedFor": "Üçüncü araç: BMW M3 GTR gövdesi ve iç mekânı",
       "changes": "Sıkıştırıldı (meshopt + WebP), lastik/jant parçaları oyunun prosedürel tekerlekleriyle değiştirildi, boya bölgelerine ayrıldı"
+    },
+    {
+      "name": "BMW M3 GTR - engine and exhaust sound",
+      "author": "Binar Yustanto (YouTube)",
+      "source": "https://commons.wikimedia.org/wiki/File:BMW_M3_GTR_-_engine_and_exhaust_sound_(YouTube_r4qL2wTGcFM).opus",
+      "license": "CC-BY-3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+      "usedFor": "Motor sesi (devir katmanları)",
+      "changes": "Kısa döngüler kesildi, dikişsiz döngüye çevrildi, ses seviyesi normalize edildi"
+    },
+    {
+      "name": "Ford Mustang GT (S550) - engine and exhaust sound",
+      "author": "Cestni dirkač (YouTube)",
+      "source": "https://commons.wikimedia.org/wiki/File:Ford_Mustang_GT_(S550)_-_engine_and_exhaust_sound_(YouTube_2ceiDjGgpI8).opus",
+      "license": "CC-BY-3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+      "usedFor": "Motor sesi (devir katmanları)",
+      "changes": "Kısa döngüler kesildi, dikişsiz döngüye çevrildi, ses seviyesi normalize edildi"
+    },
+    {
+      "name": "Ford Mustang GT with modified exhaust - engine and exhaust sound",
+      "author": "Summit Auto 4K Reviews (YouTube)",
+      "source": "https://commons.wikimedia.org/wiki/File:Ford_Mustang_GT_with_modified_exhaust_-_engine_and_exhaust_sound_(YouTube_3iVvHi5mXLg).opus",
+      "license": "CC-BY-3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+      "usedFor": "Motor sesi (devir katmanları)",
+      "changes": "Kısa döngüler kesildi, dikişsiz döngüye çevrildi, ses seviyesi normalize edildi"
+    },
+    {
+      "name": "Ford Mustang Mach 1 (2021) - engine and exhaust sound",
+      "author": "LSX632 Performance (YouTube)",
+      "source": "https://commons.wikimedia.org/wiki/File:Ford_Mustang_Mach_1_(2021)_-_engine_and_exhaust_sound_(YouTube_HydyGJGAOrw).opus",
+      "license": "CC-BY-3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+      "usedFor": "Motor sesi (devir katmanları)",
+      "changes": "Kısa döngüler kesildi, dikişsiz döngüye çevrildi, ses seviyesi normalize edildi"
+    },
+    {
+      "name": "Oldsmobile 442 - engine and exhaust sound",
+      "author": "Luciano's Classics (YouTube)",
+      "source": "https://commons.wikimedia.org/wiki/File:Oldsmobile_442_-_engine_and_exhaust_sound_(YouTube_xqK8IFpMdE4).opus",
+      "license": "CC-BY-3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+      "usedFor": "Motor sesi (devir katmanları)",
+      "changes": "Kısa döngüler kesildi, dikişsiz döngüye çevrildi, ses seviyesi normalize edildi"
+    },
+    {
+      "name": "Plymouth Duster - engine and exhaust sound",
+      "author": "DREAMGOATINC (YouTube)",
+      "source": "https://commons.wikimedia.org/wiki/File:Plymouth_Duster_-_engine_and_exhaust_sound_(YouTube_FWzja7TuZiw).opus",
+      "license": "CC-BY-3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+      "usedFor": "Motor sesi (devir katmanları)",
+      "changes": "Kısa döngüler kesildi, dikişsiz döngüye çevrildi, ses seviyesi normalize edildi"
+    },
+    {
+      "name": "Chevrolet Chevelle - engine and exhaust sound",
+      "author": "Best Sport CARS Video (YouTube)",
+      "source": "https://commons.wikimedia.org/wiki/File:Chevrolet_Chevelle_-_engine_and_exhaust_sound_(YouTube_i8AoOUTIMIk).opus",
+      "license": "CC-BY-3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+      "usedFor": "Motor sesi (devir katmanları)",
+      "changes": "Kısa döngüler kesildi, dikişsiz döngüye çevrildi, ses seviyesi normalize edildi"
+    },
+    {
+      "name": "Shelby GT500 (2012) - engine and exhaust sound",
+      "author": "LUNI Classic Cars (YouTube)",
+      "source": "https://commons.wikimedia.org/wiki/File:Shelby_GT500_(2012)_-_engine_and_exhaust_sound_(YouTube_Zc3gxBIXnXU).opus",
+      "license": "CC-BY-3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+      "usedFor": "Motor sesi (devir katmanları)",
+      "changes": "Kısa döngüler kesildi, dikişsiz döngüye çevrildi, ses seviyesi normalize edildi"
     }
   ]
 }

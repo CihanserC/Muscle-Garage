@@ -1,0 +1,68 @@
+{
+ "vanta_stallion_70": [
+  {
+   "file": "vanta_stallion_70_599.wav",
+   "rpm": 599
+  },
+  {
+   "file": "vanta_stallion_70_1426.wav",
+   "rpm": 1426
+  },
+  {
+   "file": "vanta_stallion_70_1807.wav",
+   "rpm": 1807
+  },
+  {
+   "file": "vanta_stallion_70_4864.wav",
+   "rpm": 4864
+  }
+ ],
+ "ford_mustang_gt_2013": [
+  {
+   "file": "ford_mustang_gt_2013_981.wav",
+   "rpm": 981
+  },
+  {
+   "file": "ford_mustang_gt_2013_1662.wav",
+   "rpm": 1662
+  },
+  {
+   "file": "ford_mustang_gt_2013_2093.wav",
+   "rpm": 2093
+  },
+  {
+   "file": "ford_mustang_gt_2013_2768.wav",
+   "rpm": 2768
+  },
+  {
+   "file": "ford_mustang_gt_2013_3243.wav",
+   "rpm": 3243
+  }
+ ],
+ "bmw_m3_gtr_2001": [
+  {
+   "file": "bmw_m3_gtr_2001_760.wav",
+   "rpm": 760
+  },
+  {
+   "file": "bmw_m3_gtr_2001_1858.wav",
+   "rpm": 1858
+  },
+  {
+   "file": "bmw_m3_gtr_2001_2544.wav",
+   "rpm": 2544
+  },
+  {
+   "file": "bmw_m3_gtr_2001_3275.wav",
+   "rpm": 3275
+  },
+  {
+   "file": "bmw_m3_gtr_2001_4295.wav",
+   "rpm": 4295
+  },
+  {
+   "file": "bmw_m3_gtr_2001_5606.wav",
+   "rpm": 5606
+  }
+ ]
+}

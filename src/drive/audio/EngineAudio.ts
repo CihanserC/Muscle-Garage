@@ -1,3 +1,6 @@
+import { layerMix, type EngineLayer } from '../../core/drive/engineLayers';
+import { engineLayersFor, engineLayerUrl } from '../../data/engineSounds';
+
 /** Egzoz tipine göre ses karakteri (§5.2: egzoz sesi tonunu etkiler). */
 export const EXHAUST_VOICE: Record<
   string,
@@ -45,8 +48,9 @@ function noiseBuffer(ctx: AudioContext, seconds: number): AudioBuffer {
 }
 
 /**
- * Web Audio ile sentezlenmiş motor, süperşarjör, lastik ve rüzgar sesi (gerçek ses dosyaları
- * gelene kadar yer tutucu). Tarayıcı izin verene kadar sessiz kalır.
+ * Motor sesi: aracın kayıtlı devir katmanları (CC BY kayıtlardan döngüler) devire göre karışır ve
+ * perdesi devirle ölçeklenir; katmanlar yüklenemezse sentezlenmiş motor çalar. Lastik ve rüzgar
+ * sesi sentezdir. Tarayıcı izin verene kadar sessiz kalır.
  */
 export class EngineAudio {
   private ctx: AudioContext | null = null;
@@ -64,8 +68,57 @@ export class EngineAudio {
   private squealGain!: GainNode;
   private windGain!: GainNode;
   private sources: AudioScheduledSourceNode[] = [];
+  /** Yüklenen kayıtlı katmanlar (devre göre artan); boşsa sentez çalar */
+  private layers: EngineLayer[] = [];
+  private layerSources: AudioBufferSourceNode[] = [];
+  private layerGains: GainNode[] = [];
+  private sampleFilter: BiquadFilterNode | null = null;
 
-  constructor(private readonly exhaust: string) {}
+  constructor(
+    private readonly exhaust: string,
+    private readonly carId: string = '',
+  ) {}
+
+  /**
+   * Aracın motor kayıtlarını yükleyip döngüye alır. Başarısız olursa (dosya yok, çözülemedi)
+   * sentez motoru çalmaya devam eder.
+   */
+  private async loadLayers(ctx: AudioContext): Promise<void> {
+    const wanted = engineLayersFor(this.carId);
+    if (wanted.length === 0) return;
+    const loaded = await Promise.all(
+      wanted.map(async (layer) => {
+        try {
+          const res = await fetch(engineLayerUrl(this.carId, layer));
+          if (!res.ok) return null;
+          return { layer, buffer: await ctx.decodeAudioData(await res.arrayBuffer()) };
+        } catch {
+          return null;
+        }
+      }),
+    );
+    // Bu arada durdurulduysa ya da hiç yüklenemediyse sentezde kal
+    const ok = loaded.filter((l) => l !== null);
+    if (this.ctx !== ctx || ok.length === 0) return;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 9000;
+    filter.connect(this.master);
+    this.sampleFilter = filter;
+    for (const { layer, buffer } of ok) {
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+      source.loop = true;
+      const gain = ctx.createGain();
+      gain.gain.value = 0;
+      source.connect(gain).connect(filter);
+      source.start();
+      this.layerSources.push(source);
+      this.layerGains.push(gain);
+      this.layers.push(layer);
+      this.sources.push(source);
+    }
+  }
 
   /** Kullanıcı etkileşiminden sonra çağır (autoplay politikası). */
   start(): void {
@@ -147,6 +200,7 @@ export class EngineAudio {
 
     this.sources = [this.oscA, this.oscB, this.oscRumble, this.oscWhine, noise, squeal, wind];
     for (const s of this.sources) s.start();
+    void this.loadLayers(ctx);
   }
 
   /** Tarayıcı AudioContext'i askıya aldıysa kullanıcı etkileşiminde sürdür. */
@@ -167,15 +221,31 @@ export class EngineAudio {
     set(this.oscA.frequency, fire);
     set(this.oscB.frequency, fire / 2);
     set(this.oscRumble.frequency, fire / 4);
+    if (this.layers.length > 0) this.updateLayers(f, set);
     const load = 0.35 + f.throttle * 0.65;
     set(this.engineFilter.frequency, (320 + f.rpm * 0.28 + f.throttle * 700) * voice.cutoff);
-    set(this.engineGain.gain, (0.07 + load * 0.2) * voice.gain);
-    set(this.rasp.gain, f.throttle * 0.05 * voice.raspy * Math.min(1, f.rpm / 4000));
-    set(this.whineGain.gain, f.supercharged ? 0.012 + f.throttle * 0.035 : 0);
+    const sampled = this.layers.length > 0;
+    set(this.engineGain.gain, sampled ? 0 : (0.07 + load * 0.2) * voice.gain);
+    set(this.rasp.gain, sampled ? 0 : f.throttle * 0.05 * voice.raspy * Math.min(1, f.rpm / 4000));
+    set(this.whineGain.gain, !sampled && f.supercharged ? 0.012 + f.throttle * 0.035 : 0);
     set(this.oscWhine.frequency, 380 + f.rpm * 0.55);
     set(this.squealFilter.frequency, 1100 + f.slip * 700 + f.speed * 6);
     set(this.squealGain.gain, f.slip > 0.25 ? Math.min(1, f.slip) * 0.16 : 0);
     set(this.windGain.gain, Math.min(1, f.speed / 70) * 0.1);
+  }
+
+  /** Kayıtlı katmanları devire göre karıştırır ve perdelerini ayarlar. */
+  private updateLayers(f: AudioFrame, set: (p: AudioParam, v: number) => void): void {
+    const mix = layerMix(this.layers, f.rpm);
+    const level = 0.55 + 0.45 * f.throttle;
+    this.layerGains.forEach((g, i) => {
+      const m = mix.find((x) => x.index === i);
+      set(g.gain, m ? m.gain * level * 1.4 : 0);
+      const src = this.layerSources[i];
+      if (src && m) set(src.playbackRate, m.rate);
+    });
+    // Gaz kapalıyken ses biraz kısık (motor freni), gazda parlak
+    if (this.sampleFilter) set(this.sampleFilter.frequency, 2200 + f.throttle * 7000);
   }
 
   stop(): void {
@@ -187,6 +257,10 @@ export class EngineAudio {
       }
     }
     this.sources = [];
+    this.layers = [];
+    this.layerSources = [];
+    this.layerGains = [];
+    this.sampleFilter = null;
     void this.ctx?.close();
     this.ctx = null;
   }
