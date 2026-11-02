@@ -12,6 +12,15 @@ Gerçek telefonda test edildi: butonlar ekranı kaplıyor, araç ekrana göre b�
 - **Dokunmatik kontroller büyütüldü** (katman ölçeğini telafi: gaz 116×150, fren 98×112, direksiyon bölgesi 120 px yüksek, üst düğmeler 58 px); mobil HUD'daki ek küçültmeler azaltıldı.
 - **Atölye paneli katlanır** (▾/▴, yalnız dar ekranda): sahne ve araç görünür kalır.
 
+## Telefon testi, ikinci tur — 2026-11-02
+
+Telefonda hâlâ Esc ipucu görünüyor, gaz/fren düğmeleri ve ayarlar düğmesi yoktu, hız göstergesi ile minimap üst üsteydi. Olası neden: dokunmatik algılanmadı (ör. masaüstü sitesi modu). Düzeltmeler (gözle doğrulanmadı):
+
+- **Dokunmatik algısı:** kısa kenarı ≤500 px ve uzun kenarı ≤1000 px olan ekran, tarayıcı ne derse desin dokunmatik sayılır (`computeLayout`). Gerçek bir `touchstart` görülünce (kısa kenar ≤900 px) dokunmatik mod kalıcı açılır (`touchSeen`, `mg-layout` olayı).
+- **Sürüşte ayarlar düğmesi (⚙):** dokunmatik kontrollerde; oyunu duraklatır ve Ayarlar'ı açar.
+- **Sürüm damgası:** Ayarlar'da derleme zamanı (`__BUILD_ID__`, UTC); yayının güncel olup olmadığı anlaşılır.
+- Testler: 494.
+
 ## Geliştirme fikirleri turu (PLAN_V2 §8) — 2026-11-02
 
 **Yapıldı** (487 test; lint, tür kontrolü, derleme yeşil)
