@@ -5,7 +5,12 @@ export const CONTROL_SCHEMES = ['auto', 'touch', 'keyboard'] as const;
 /** Kontrol düzeni: otomatik (cihaza göre), ekran dokunmatik kontrolleri ya da klavye/gamepad */
 export type ControlScheme = (typeof CONTROL_SCHEMES)[number];
 
+/** HUD ölçek basamakları (erişilebilirlik) */
+export const HUD_SCALES = [0.85, 1, 1.2, 1.4] as const;
+
 export type HudSettings = {
+  /** HUD yazı/gösterge ölçeği */
+  hudScale: number;
   /** Hız göstergesi üstündeki ABS / TC / el freni / drift lambaları */
   showLamps: boolean;
   /** En iyi turun hayaleti (mavi kutu) */
@@ -17,9 +22,11 @@ export type HudState = HudSettings & {
   setShowLamps: (on: boolean) => void;
   setShowGhost: (on: boolean) => void;
   setControlScheme: (scheme: ControlScheme) => void;
+  setHudScale: (scale: number) => void;
 };
 
 export const DEFAULT_HUD_SETTINGS: HudSettings = {
+  hudScale: 1,
   showLamps: false,
   showGhost: true,
   controlScheme: 'auto',
@@ -33,6 +40,9 @@ export function sanitizeHudSettings(input: unknown): HudSettings {
   return {
     showLamps: flag('showLamps'),
     showGhost: flag('showGhost'),
+    hudScale: HUD_SCALES.includes(src.hudScale as (typeof HUD_SCALES)[number])
+      ? (src.hudScale as number)
+      : 1,
     controlScheme: CONTROL_SCHEMES.includes(src.controlScheme as ControlScheme)
       ? (src.controlScheme as ControlScheme)
       : 'auto',
@@ -52,6 +62,7 @@ export const useHudStore = create<HudState>()(
       setShowLamps: (showLamps) => set({ showLamps }),
       setShowGhost: (showGhost) => set({ showGhost }),
       setControlScheme: (controlScheme) => set({ controlScheme }),
+      setHudScale: (hudScale) => set({ hudScale }),
     }),
     {
       name: 'muscle-garage.hud',
@@ -60,6 +71,7 @@ export const useHudStore = create<HudState>()(
         showLamps: s.showLamps,
         showGhost: s.showGhost,
         controlScheme: s.controlScheme,
+        hudScale: s.hudScale,
       }),
       merge: (persisted, current) => ({ ...current, ...sanitizeHudSettings(persisted) }),
     },

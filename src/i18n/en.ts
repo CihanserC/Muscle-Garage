@@ -396,6 +396,7 @@ export const en: Record<string, string> = {
   'tilt.on': 'On',
   'tilt.inverted': 'On (inverted)',
   'settings.controls': 'Controls',
+  'settings.hudScale': 'HUD size',
   'settings.lamps': 'Indicator lamps (ABS/TC/HB/drift)',
   'settings.ghost': 'Best-lap ghost',
   'controls.auto': 'Auto',

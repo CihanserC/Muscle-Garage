@@ -20,6 +20,8 @@ export type AudioFrame = {
   /** 0..1 ana ses seviyesi (0 = sessiz) */
   volume: number;
   paused: boolean;
+  /** Gaz bırakıldı: egzoz patlamaları (kısa süre true) */
+  liftOff?: boolean;
 };
 
 const TWO_PI_SMOOTH = 0.04;
@@ -36,6 +38,23 @@ function distortionCurve(amount: number): Float32Array<ArrayBuffer> {
   }
   return curve;
 }
+
+/**
+ * V8 ateşleme dalgası: temel + zengin harmonikler (alçak harmonikler baskın, çift harmonikler biraz
+ * öne çıkar). Testere/kare dalgadan daha dolgun ve "yuvarlak" duyulur.
+ */
+export function v8Harmonics(count: number): { real: Float32Array; imag: Float32Array } {
+  const real = new Float32Array(count + 1);
+  const imag = new Float32Array(count + 1);
+  for (let k = 1; k <= count; k++) imag[k] = (1 / Math.pow(k, 1.15)) * (k % 2 === 0 ? 1.18 : 1);
+  return { real, imag };
+}
+
+/** Rölantide belirgin, devir arttıkça kaybolan düzensiz ateşleme (lope) derinliği 0..1 */
+export const lopeDepth = (rpm: number): number => 0.38 * Math.max(0, 1 - rpm / 3500);
+
+/** Gaz kapamada patlama olasılığı: yüksek devirde daha sık */
+export const popChance = (rpm: number): number => Math.min(0.9, Math.max(0, (rpm - 2500) / 4500));
 
 function noiseBuffer(ctx: AudioContext, seconds: number): AudioBuffer {
   const buffer = ctx.createBuffer(1, Math.floor(ctx.sampleRate * seconds), ctx.sampleRate);
@@ -56,6 +75,12 @@ export class EngineAudio {
   private oscRumble!: OscillatorNode;
   private oscWhine!: OscillatorNode;
   private engineFilter!: BiquadFilterNode;
+  private lope!: GainNode;
+  private lopeLfo!: OscillatorNode;
+  private lopeDepthGain!: GainNode;
+  private lastPop = 0;
+  private wasLifting = false;
+  private popNoise: AudioBuffer | null = null;
   private engineGain!: GainNode;
   private rumbleGain!: GainNode;
   private rasp!: GainNode;
@@ -86,10 +111,12 @@ export class EngineAudio {
     this.engineGain = ctx.createGain();
     this.engineGain.gain.value = 0;
 
+    const wave = v8Harmonics(28);
+    const wave2 = v8Harmonics(10);
     this.oscA = ctx.createOscillator();
-    this.oscA.type = 'sawtooth';
+    this.oscA.setPeriodicWave(ctx.createPeriodicWave(wave.real, wave.imag));
     this.oscB = ctx.createOscillator();
-    this.oscB.type = 'square';
+    this.oscB.setPeriodicWave(ctx.createPeriodicWave(wave2.real, wave2.imag));
     this.oscRumble = ctx.createOscillator();
     this.oscRumble.type = 'triangle';
     const gainA = ctx.createGain();
@@ -102,7 +129,16 @@ export class EngineAudio {
     this.oscB.connect(gainB).connect(shaper);
     this.oscRumble.connect(this.rumbleGain).connect(this.engineFilter);
     shaper.connect(this.engineFilter);
-    this.engineFilter.connect(this.engineGain).connect(this.master);
+    // Lope: ateşleme düzensizliği, rölantide genlik dalgalanması
+    this.lope = ctx.createGain();
+    this.lope.gain.value = 1;
+    this.lopeLfo = ctx.createOscillator();
+    this.lopeLfo.type = 'sine';
+    this.lopeDepthGain = ctx.createGain();
+    this.lopeDepthGain.gain.value = 0;
+    this.lopeLfo.connect(this.lopeDepthGain).connect(this.lope.gain);
+    this.engineFilter.connect(this.lope).connect(this.engineGain).connect(this.master);
+    this.popNoise = noiseBuffer(ctx, 0.2);
 
     // Egzoz hırıltısı: gürültü, gaz ve rpm ile artar
     const noise = ctx.createBufferSource();
@@ -145,7 +181,16 @@ export class EngineAudio {
     this.windGain.gain.value = 0;
     wind.connect(windFilter).connect(this.windGain).connect(this.master);
 
-    this.sources = [this.oscA, this.oscB, this.oscRumble, this.oscWhine, noise, squeal, wind];
+    this.sources = [
+      this.oscA,
+      this.oscB,
+      this.oscRumble,
+      this.oscWhine,
+      this.lopeLfo,
+      noise,
+      squeal,
+      wind,
+    ];
     for (const s of this.sources) s.start();
   }
 
@@ -167,6 +212,10 @@ export class EngineAudio {
     set(this.oscA.frequency, fire);
     set(this.oscB.frequency, fire / 2);
     set(this.oscRumble.frequency, fire / 4);
+    set(this.lopeLfo.frequency, fire / 8);
+    set(this.lopeDepthGain.gain, lopeDepth(f.rpm));
+    if (f.liftOff && !this.wasLifting) this.pop(ctx, f.rpm);
+    this.wasLifting = !!f.liftOff;
     const load = 0.35 + f.throttle * 0.65;
     set(this.engineFilter.frequency, (320 + f.rpm * 0.28 + f.throttle * 700) * voice.cutoff);
     set(this.engineGain.gain, (0.07 + load * 0.2) * voice.gain);
@@ -176,6 +225,25 @@ export class EngineAudio {
     set(this.squealFilter.frequency, 1100 + f.slip * 700 + f.speed * 6);
     set(this.squealGain.gain, f.slip > 0.25 ? Math.min(1, f.slip) * 0.16 : 0);
     set(this.windGain.gain, Math.min(1, f.speed / 70) * 0.1);
+  }
+
+  /** Gaz kapama patlaması: kısa, alçak geçişli gürültü darbesi (en çok 4/sn). */
+  private pop(ctx: AudioContext, rpm: number): void {
+    const now = ctx.currentTime;
+    if (!this.popNoise || now - this.lastPop < 0.25 || Math.random() > popChance(rpm)) return;
+    this.lastPop = now;
+    const burst = ctx.createBufferSource();
+    burst.buffer = this.popNoise;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = 160 + Math.random() * 240;
+    filter.Q.value = 0.9;
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.5 + Math.random() * 0.3, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+    burst.connect(filter).connect(gain).connect(this.master);
+    burst.start(now);
+    burst.stop(now + 0.2);
   }
 
   stop(): void {

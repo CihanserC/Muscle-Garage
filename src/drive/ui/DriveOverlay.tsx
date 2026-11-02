@@ -486,8 +486,12 @@ export function DriveOverlay() {
   const scheme = useHudStore((st) => st.controlScheme);
   const isTouch = resolveTouch(scheme, layout.isTouch);
   const isPortrait = layout.isPortrait;
+  const hudScale = useHudStore((st) => st.hudScale);
   return (
-    <div className={`dv-root${isTouch ? ' is-touch' : ''}`}>
+    <div
+      className={`dv-root${isTouch ? ' is-touch' : ''}`}
+      style={{ ['--hud-scale' as string]: hudScale }}
+    >
       {ready ? <Hud /> : <div className="dv-loading">{t('drive.loading')}</div>}
       {ready && isTouch && !paused && !isPortrait && <TouchControls />}
       {isTouch && isPortrait && <div className="dv-rotate">{t('touch.rotate')}</div>}

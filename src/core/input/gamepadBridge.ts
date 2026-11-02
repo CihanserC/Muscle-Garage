@@ -56,3 +56,20 @@ export function startGamepadBridge(context: () => PadContext): () => void {
   frame = requestAnimationFrame(tick);
   return () => cancelAnimationFrame(frame);
 }
+
+/**
+ * Gamepad titreşimi (destekleyen tarayıcı/cihazda): strong = ağır motor, weak = hafif motor (0..1).
+ * Gamepad yoksa ya da titreşim desteklenmiyorsa sessizce geçer.
+ */
+export function rumbleGamepad(strong: number, weak: number, durationMs: number): void {
+  const pad = activePad() as (PadSnapshot & { vibrationActuator?: GamepadHapticActuator }) | null;
+  const actuator = pad?.vibrationActuator;
+  if (!actuator) return;
+  void actuator
+    .playEffect('dual-rumble', {
+      duration: durationMs,
+      strongMagnitude: Math.max(0, Math.min(1, strong)),
+      weakMagnitude: Math.max(0, Math.min(1, weak)),
+    })
+    .catch(() => undefined);
+}

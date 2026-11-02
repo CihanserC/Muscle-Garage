@@ -6,7 +6,7 @@ import { TILT_MODES } from '../../core/input/tilt';
 import { disableGyro, enableGyro } from '../../drive/gyroInput';
 import { useAssistStore } from '../../core/store/assistStore';
 import { useDriveStore } from '../../core/store/driveStore';
-import { CONTROL_SCHEMES, useHudStore } from '../../core/store/hudStore';
+import { CONTROL_SCHEMES, HUD_SCALES, useHudStore } from '../../core/store/hudStore';
 import { useInputStore } from '../../core/store/inputStore';
 import { useAudioStore } from '../../core/store/audioStore';
 import { QUALITY_LEVELS, TONE_MAPPINGS, useGraphicsStore } from '../../core/store/graphicsStore';
@@ -112,6 +112,13 @@ function useRows(): Row[] {
       label: t('settings.controls'),
       value: t(`controls.${hud.controlScheme}`),
       step: (d: -1 | 1) => hud.setControlScheme(cycle(CONTROL_SCHEMES, hud.controlScheme, d)),
+    },
+    {
+      id: 'hudScale',
+      label: t('settings.hudScale'),
+      value: `${Math.round(hud.hudScale * 100)}%`,
+      step: (d: -1 | 1) =>
+        hud.setHudScale(cycle(HUD_SCALES, hud.hudScale as (typeof HUD_SCALES)[number], d)),
     },
     {
       id: 'lamps',

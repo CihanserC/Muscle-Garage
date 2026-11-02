@@ -152,21 +152,21 @@
   top: calc(8px + var(--safe-top, 0px));
   left: calc(8px + var(--safe-left, 0px));
   padding: 4px 8px 6px;
-  transform: scale(0.82);
+  transform: scale(calc(0.82 * var(--hud-scale, 1)));
   transform-origin: top left;
 }
 
 .dv-root.is-touch .dv-topright {
   top: calc(8px + var(--safe-top, 0px));
   right: calc(8px + var(--safe-right, 0px));
-  transform: scale(0.62);
+  transform: scale(calc(0.62 * var(--hud-scale, 1)));
   transform-origin: top right;
 }
 
 .dv-root.is-touch .dv-speedo {
   right: 50%;
   bottom: calc(4px + var(--safe-bottom, 0px));
-  transform: translateX(50%) scale(0.56);
+  transform: translateX(50%) scale(calc(0.56 * var(--hud-scale, 1)));
   transform-origin: bottom center;
 }
 
@@ -174,7 +174,7 @@
   right: auto;
   left: calc(50% + 72px);
   bottom: calc(10px + var(--safe-bottom, 0px));
-  transform: scale(0.6);
+  transform: scale(calc(0.6 * var(--hud-scale, 1)));
   transform-origin: bottom left;
 }
 
@@ -190,4 +190,21 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: rgba(216, 213, 206, 0.7);
+}
+
+/* HUD ölçeği (Ayarlar → HUD boyutu); klavye düzeninde köşelere göre büyür */
+.dv-root:not(.is-touch) .dv-lap {
+  transform: scale(var(--hud-scale, 1));
+  transform-origin: top left;
+}
+
+.dv-root:not(.is-touch) .dv-topright {
+  transform: scale(var(--hud-scale, 1));
+  transform-origin: top right;
+}
+
+.dv-root:not(.is-touch) .dv-speedo,
+.dv-root:not(.is-touch) .dv-nitro {
+  transform: scale(var(--hud-scale, 1));
+  transform-origin: bottom right;
 }

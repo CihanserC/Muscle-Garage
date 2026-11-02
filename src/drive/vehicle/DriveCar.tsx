@@ -7,6 +7,8 @@ import {
   type Ghost,
   type GhostSample,
 } from '../../core/drive/ghost';
+import { rumbleLevels } from '../../core/input/rumble';
+import { rumbleGamepad } from '../../core/input/gamepadBridge';
 import { touchBrakeToDrift } from '../../core/input/touch';
 import { useAssistStore } from '../../core/store/assistStore';
 import { touchState } from '../touchInput';
@@ -44,6 +46,8 @@ import { PHYSICS_STEP, VehiclePhysics, type VehicleSnapshot } from '../physics/V
 const MAX_STEPS_PER_FRAME = 10;
 /** HUD güncelleme aralığı (sn) */
 const HUD_INTERVAL = 0.08;
+/** Gamepad titreşim güncelleme aralığı (sn) */
+const RUMBLE_INTERVAL = 0.08;
 
 /** Cam materyali adları (paylaşılan mat_glass ve modellerin kendi cam materyalleri) */
 const GLASS_NAME = /^(mat_glass|GLS_Clear|GLS_WindScreen)$|Glass1$/;
@@ -98,6 +102,8 @@ export function DriveCar({
   const recording = useRef<GhostSample[]>([]);
   const acc = useRef(0);
   const hudClock = useRef(0);
+  const rumbleClock = useRef(0);
+  const lastSpeed = useRef(0);
   const supercharged = build.parts.engine === 'blower_v8';
   const exhaust = build.parts.exhaust ?? 'rear_dual';
 
@@ -274,7 +280,22 @@ export function DriveCar({
       supercharged,
       volume: useAudioStore.getState().volume,
       paused: store.paused,
+      liftOff: snap.liftOff,
     });
+
+    // Gamepad titreşimi (~12 Hz): kayma, nitro ve ani hız kaybı (çarpma)
+    rumbleClock.current += delta;
+    if (rumbleClock.current >= RUMBLE_INTERVAL && !store.paused) {
+      const slip = Math.max(...snap.wheels.map((w) => w.slip));
+      const r = rumbleLevels({
+        slip,
+        nitro: snap.nitroActive,
+        speedDrop: Math.max(0, lastSpeed.current - snap.speed),
+      });
+      lastSpeed.current = snap.speed;
+      rumbleClock.current = 0;
+      if (r.strong > 0 || r.weak > 0) rumbleGamepad(r.strong, r.weak, RUMBLE_INTERVAL * 1000 * 1.5);
+    }
 
     hudClock.current += delta;
     if (hudClock.current >= HUD_INTERVAL) {

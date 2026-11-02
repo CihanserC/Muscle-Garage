@@ -12,8 +12,14 @@ describe('hudStore', () => {
   });
   it('geçerli değerleri korur', () => {
     expect(
-      sanitizeHudSettings({ showLamps: true, showGhost: false, controlScheme: 'keyboard' }),
-    ).toEqual({ showLamps: true, showGhost: false, controlScheme: 'keyboard' });
+      sanitizeHudSettings({
+        showLamps: true,
+        showGhost: false,
+        controlScheme: 'keyboard',
+        hudScale: 1.2,
+      }),
+    ).toEqual({ showLamps: true, showGhost: false, controlScheme: 'keyboard', hudScale: 1.2 });
+    expect(sanitizeHudSettings({ hudScale: 7 }).hudScale).toBe(1);
   });
   it('kontrol düzeni: otomatik cihaza bakar, açık seçim cihazı geçersiz kılar', () => {
     expect(resolveTouch('auto', true)).toBe(true);
