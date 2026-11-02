@@ -512,3 +512,93 @@
 .dv-nitro.is-empty .dv-nitro-label {
   color: #7d7a74;
 }
+
+/* Gaz / fren çubukları */
+.dv-pedals {
+  position: absolute;
+  right: 308px;
+  bottom: 30px;
+  display: flex;
+  gap: 5px;
+  align-items: flex-end;
+}
+
+.dv-pedal {
+  position: relative;
+  width: 9px;
+  height: 150px;
+  overflow: hidden;
+  background: rgba(8, 9, 12, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 5px;
+}
+
+.dv-pedal span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.dv-pedal.is-brake span {
+  background: #ff4a3a;
+}
+
+.dv-pedal.is-throttle span {
+  background: #39e07a;
+}
+
+/* Uyarı lambaları */
+.dv-lamps {
+  position: absolute;
+  right: 24px;
+  bottom: 258px;
+  display: flex;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.dv-lamp {
+  min-width: 34px;
+  padding: 2px 6px;
+  text-align: center;
+  color: rgba(216, 213, 206, 0.3);
+  background: rgba(8, 9, 12, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+}
+
+.dv-lamp.is-on {
+  color: #0b0c0e;
+  background: #ffb020;
+  border-color: #ffb020;
+}
+
+.dv-lamp.is-red.is-on {
+  color: #fff;
+  background: #e5392b;
+  border-color: #e5392b;
+}
+
+.dv-lamp.is-drift.is-on {
+  background: #2fd8ff;
+  border-color: #2fd8ff;
+}
+
+/* En iyi tura fark */
+.dv-lap-delta {
+  margin-left: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.dv-lap-delta.is-ahead {
+  color: #39e07a;
+}
+
+.dv-lap-delta.is-behind {
+  color: #ff5a4a;
+}

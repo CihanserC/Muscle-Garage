@@ -6,9 +6,11 @@ export type Assists = {
   tractionControl: boolean;
   /** Direksiyon yardımı: kuyruk savrulurken otomatik ters direksiyon */
   steeringAssist: boolean;
+  /** ABS: kayarken fren kuvvetini kısar, tekerlekler tutuşunu korusun */
+  abs: boolean;
 };
 
-export const DEFAULT_ASSISTS: Assists = { tractionControl: false, steeringAssist: true };
+export const DEFAULT_ASSISTS: Assists = { tractionControl: false, steeringAssist: true, abs: true };
 
 /** Çekiş kontrolünün gazı en fazla bu orana kadar kısması */
 const TC_MIN_THROTTLE = 0.25;
@@ -23,6 +25,13 @@ const COUNTER_STEER_DEADZONE = 0.07;
 /** Yardımın direksiyona ekleyebileceği azami miktar */
 const COUNTER_STEER_MAX = 0.6;
 
+/** ABS: gövde kayma açısı (rad) bu değerin üstünde fren kısılmaya başlar (≈7°) */
+const ABS_BETA_START = 0.12;
+/** ... bu değerde (≈23°) fren ABS_MIN_BRAKE'e iner */
+const ABS_BETA_FULL = 0.4;
+/** ABS'nin freni en fazla bu orana kadar kısması */
+const ABS_MIN_BRAKE = 0.45;
+
 export type AssistContext = {
   forwardSpeed: number;
   lateralSpeed: number;
@@ -35,7 +44,12 @@ export type AssistContext = {
  * yardım yalnız kayma yönüne doğru ek bir düzeltme ekler.
  */
 export function applyAssists(input: DriveInput, ctx: AssistContext, assists: Assists): DriveInput {
-  let { throttle, steer } = input;
+  let { throttle, steer, brake } = input;
+  if (assists.abs && brake > 0 && !input.handbrake && ctx.forwardSpeed > ASSIST_MIN_SPEED) {
+    const beta = Math.abs(Math.atan2(ctx.lateralSpeed, ctx.forwardSpeed));
+    const t = Math.min(1, Math.max(0, (beta - ABS_BETA_START) / (ABS_BETA_FULL - ABS_BETA_START)));
+    brake *= 1 - t * (1 - ABS_MIN_BRAKE);
+  }
   if (assists.tractionControl && ctx.slipSpeed > 0.3) {
     const cut = Math.min(1, ctx.slipSpeed / TC_FULL_CUT_SLIP);
     throttle *= 1 - cut * (1 - TC_MIN_THROTTLE);
@@ -50,5 +64,5 @@ export function applyAssists(input: DriveInput, ctx: AssistContext, assists: Ass
     );
     steer = Math.max(-1, Math.min(1, steer + add));
   }
-  return { ...input, throttle, steer };
+  return { ...input, throttle, steer, brake };
 }

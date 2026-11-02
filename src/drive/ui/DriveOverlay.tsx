@@ -9,7 +9,7 @@ import {
   GAUGE_START_DEG,
   GAUGE_SWEEP_DEG,
 } from '../../core/drive/gauge';
-import { formatLapTime } from '../../core/drive/lap';
+import { formatDelta, formatLapTime } from '../../core/drive/lap';
 import { getDefaultTrack, type TrackSample } from '../../core/drive/track';
 import { useAppStore } from '../../core/store/appStore';
 import { useAudioStore } from '../../core/store/audioStore';
@@ -200,6 +200,38 @@ function NitroGauge() {
   );
 }
 
+/** Gaz / fren çubukları: nitro tüpünün solunda ince dikey çubuklar. */
+function Pedals() {
+  const throttle = useDriveStore((s) => s.hud.throttle);
+  const brake = useDriveStore((s) => s.hud.brake);
+  return (
+    <div className="dv-pedals" aria-hidden>
+      <div className="dv-pedal is-brake">
+        <span style={{ height: `${brake * 100}%` }} />
+      </div>
+      <div className="dv-pedal is-throttle">
+        <span style={{ height: `${throttle * 100}%` }} />
+      </div>
+    </div>
+  );
+}
+
+/** Uyarı lambaları (ABS, TC, el freni) ve kayma açısı. */
+function Lamps() {
+  const hud = useDriveStore((s) => s.hud);
+  const drifting = hud.driftDeg >= 8;
+  return (
+    <div className="dv-lamps">
+      <span className={`dv-lamp${hud.absActive ? ' is-on' : ''}`}>ABS</span>
+      <span className={`dv-lamp${hud.tcActive ? ' is-on' : ''}`}>TC</span>
+      <span className={`dv-lamp is-red${hud.handbrake ? ' is-on' : ''}`}>{t('drive.hb')}</span>
+      <span className={`dv-lamp is-drift${drifting ? ' is-on' : ''}`}>
+        {drifting ? `${Math.round(hud.driftDeg)}°` : t('drive.drift')}
+      </span>
+    </div>
+  );
+}
+
 function Hud() {
   const hud = useDriveStore((s) => s.hud);
   const fps = useGraphicsStore((s) => s.fps);
@@ -215,6 +247,11 @@ function Hud() {
         </div>
         <div className={`dv-lap-time${lap.running ? '' : ' is-idle'}`}>
           {formatLapTime(hud.currentLap)}
+          {hud.lapDelta !== null && (
+            <small className={`dv-lap-delta${hud.lapDelta <= 0 ? ' is-ahead' : ' is-behind'}`}>
+              {formatDelta(hud.lapDelta)}
+            </small>
+          )}
         </div>
         {(lap.bestLap !== null || lap.lastLap !== null) && (
           <div className="dv-lap-sub">
@@ -233,6 +270,8 @@ function Hud() {
       </div>
       <Speedometer />
       <NitroGauge />
+      <Pedals />
+      <Lamps />
       {!lap.running && <div className="dv-banner">{t('drive.crossLine')}</div>}
       {hud.offTrack && <div className="dv-banner is-warn">{t('drive.offTrack')}</div>}
       <div className="dv-menu-hint">
@@ -324,6 +363,7 @@ function PauseMenu() {
     { id: 'resume', label: t('drive.pause.resume') },
     { id: 'restart', label: t('drive.pause.restart') },
     { id: 'controls', label: t('drive.pause.controls') },
+    { id: 'settings', label: t('settings.title') },
     { id: 'time', label: `${t('drive.pause.time')}: ${t(`timeOfDay.${timeOfDay}`)}` },
     { id: 'sound', label: `${t('drive.pause.sound')}: ${volumeLabel(volume)}` },
     { id: 'garage', label: t('drive.pause.garage') },
@@ -336,6 +376,7 @@ function PauseMenu() {
       s.restart();
       s.setPaused(false);
     } else if (id === 'controls') s.setPauseView('controls');
+    else if (id === 'settings') useAppStore.getState().setSettingsOpen(true);
     else if (id === 'time') s.toggleTimeOfDay();
     else if (id === 'sound') useAudioStore.getState().cycleVolume();
     else if (id === 'garage') leave();

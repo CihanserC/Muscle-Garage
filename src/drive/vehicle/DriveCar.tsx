@@ -1,10 +1,20 @@
-import { applyAssists, DEFAULT_ASSISTS } from '../../core/drive/assists';
+import { applyAssists } from '../../core/drive/assists';
+import { useAssistStore } from '../../core/store/assistStore';
 import { useEffect, useRef, useState, type RefObject } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Quaternion, SpotLight, Vector3, type Group } from 'three';
 import { CarRig } from '../../car/CarRig';
 import type { WheelPose } from '../../car/wheelPose';
-import { initialLap, updateLap, type LapState } from '../../core/drive/lap';
+import {
+  emptySplits,
+  initialLap,
+  lapDelta,
+  lapFraction,
+  recordSplit,
+  updateLap,
+  type LapSplits,
+  type LapState,
+} from '../../core/drive/lap';
 import type { Track } from '../../core/drive/track';
 import { deriveVehicleSpec } from '../../core/drive/vehicleSpec';
 import { useAudioStore } from '../../core/store/audioStore';
@@ -110,6 +120,11 @@ export function DriveCar({
   const input = useRef<InputSource | null>(null);
   const audio = useRef<EngineAudio | null>(null);
   const lap = useRef<LapState>(initialLap());
+  /** Bu turun ve en iyi turun dilim süreleri (en iyi tura fark göstergesi) */
+  const curSplits = useRef<LapSplits>(emptySplits());
+  const bestSplits = useRef<LapSplits | null>(null);
+  /** ABS / çekiş kontrolü son adımda girişi kıstı mı (HUD lambaları) */
+  const assistFlags = useRef({ abs: false, tc: false });
   const acc = useRef(0);
   const hudClock = useRef(0);
   const supercharged = build.parts.engine === 'blower_v8';
@@ -125,6 +140,8 @@ export function DriveCar({
       created = VehiclePhysics.create(R, spec, track);
       physics.current = created;
       lap.current = initialLap();
+      curSplits.current = emptySplits();
+      bestSplits.current = null;
       setRestHeight(created.restHeight);
       useDriveStore.getState().setReady(true);
     });
@@ -169,6 +186,7 @@ export function DriveCar({
     if (restartTick === 0) return;
     physics.current?.reset(null);
     lap.current = { ...initialLap(), bestLap: lap.current.bestLap, lastLap: lap.current.lastLap };
+    curSplits.current = emptySplits();
   }, [restartTick]);
   useEffect(() => {
     if (respawnTick > 0) physics.current?.resetOnTrack();
@@ -193,9 +211,13 @@ export function DriveCar({
               lateralSpeed: prev.lateralSpeed,
               slipSpeed: prev.slipSpeed,
             },
-            DEFAULT_ASSISTS,
+            useAssistStore.getState(),
           )
         : raw;
+      assistFlags.current = {
+        abs: drive.brake < raw.brake - 0.02,
+        tc: drive.throttle < raw.throttle - 0.02,
+      };
       while (acc.current >= PHYSICS_STEP && steps < MAX_STEPS_PER_FRAME) {
         ph.step(PHYSICS_STEP, drive);
         acc.current -= PHYSICS_STEP;
@@ -217,7 +239,23 @@ export function DriveCar({
       pose.spin = w.rotation;
     });
 
-    if (!store.paused) lap.current = updateLap(lap.current, track, snap.trackS, ph.time);
+    if (!store.paused) {
+      const before = lap.current;
+      lap.current = updateLap(before, track, snap.trackS, ph.time);
+      const after = lap.current;
+      if (after.lapStartTime !== before.lapStartTime || after.running !== before.running) {
+        // Tur bitti: en iyi tur yenilendiyse dilimleri en iyi olarak sakla
+        if (after.laps > before.laps && after.lastLap === after.bestLap)
+          bestSplits.current = curSplits.current;
+        curSplits.current = emptySplits();
+      } else if (after.running) {
+        recordSplit(
+          curSplits.current,
+          lapFraction(after.lastRel, track.length),
+          ph.time - after.lapStartTime,
+        );
+      }
+    }
 
     audio.current?.update({
       rpm: snap.rpm,
@@ -249,6 +287,23 @@ export function DriveCar({
         offTrack: snap.surface === 'grass',
         nitro: ph.spec.nitro ? snap.nitro : null,
         nitroActive: snap.nitroActive,
+        throttle: snap.throttle,
+        brake: snap.braking,
+        handbrake: snap.handbrake,
+        driftDeg:
+          Math.abs(snap.forwardSpeed) > 5
+            ? (Math.atan2(Math.abs(snap.lateralSpeed), Math.abs(snap.forwardSpeed)) * 180) /
+              Math.PI
+            : 0,
+        absActive: assistFlags.current.abs,
+        tcActive: assistFlags.current.tc,
+        lapDelta: lap.current.running
+          ? lapDelta(
+              bestSplits.current,
+              lapFraction(lap.current.lastRel, track.length),
+              ph.time - lap.current.lapStartTime,
+            )
+          : null,
       });
     }
   });

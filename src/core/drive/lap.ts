@@ -84,3 +84,45 @@ export function formatLapTime(seconds: number | null): string {
   const s = Math.floor((cs % 6000) / 100);
   return `${m}:${String(s).padStart(2, '0')}.${String(cs % 100).padStart(2, '0')}`;
 }
+
+/** Tur ilerlemesi bu kadar dilime bölünür; her dilimin geçiş süresi saklanır (en iyi tura fark için). */
+export const SPLIT_BINS = 100;
+
+/** Bir turun dilim geçiş süreleri (sn); henüz geçilmemiş dilim null. */
+export type LapSplits = (number | null)[];
+
+export const emptySplits = (): LapSplits => Array.from({ length: SPLIT_BINS }, () => null);
+
+/** Tur ilerleme oranı 0..1 (başlangıç çizgisinden; `lastRel` işaretli uzaklıktır). */
+export function lapFraction(rel: number, trackLength: number): number {
+  return (((rel % trackLength) + trackLength) % trackLength) / trackLength;
+}
+
+/**
+ * Turun şimdiye kadar geçilen dilimlerinin süresini yazar (atlanan dilimler de bu süreyle dolar).
+ * `elapsed`: turun başından beri geçen süre.
+ */
+export function recordSplit(splits: LapSplits, fraction: number, elapsed: number): void {
+  const bin = Math.min(SPLIT_BINS - 1, Math.floor(fraction * SPLIT_BINS));
+  for (let i = 0; i <= bin; i++) if (splits[i] === null) splits[i] = elapsed;
+}
+
+/**
+ * En iyi tura göre fark (sn): pozitif = en iyi turdan yavaş. Kayıtlı en iyi tur ya da o dilim
+ * yoksa null.
+ */
+export function lapDelta(
+  best: LapSplits | null,
+  fraction: number,
+  elapsed: number,
+): number | null {
+  if (!best) return null;
+  const bin = Math.min(SPLIT_BINS - 1, Math.floor(fraction * SPLIT_BINS));
+  const ref = best[bin];
+  return ref === null || ref === undefined ? null : elapsed - ref;
+}
+
+/** Fark metni: `+0.42` / `-1.07` */
+export function formatDelta(delta: number): string {
+  return `${delta >= 0 ? '+' : '-'}${Math.abs(delta).toFixed(2)}`;
+}

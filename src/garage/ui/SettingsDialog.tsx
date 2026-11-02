@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { playUiSound } from '../../audio/uiSound';
 import { useAppStore } from '../../core/store/appStore';
+import { useAssistStore } from '../../core/store/assistStore';
 import { useAudioStore } from '../../core/store/audioStore';
 import { QUALITY_LEVELS, TONE_MAPPINGS, useGraphicsStore } from '../../core/store/graphicsStore';
 import { LOCALE_NAMES, LOCALES, t, useLocale, useLocaleStore } from '../../i18n';
@@ -26,6 +27,7 @@ const cycle = <T,>(list: readonly T[], value: T, dir: -1 | 1): T =>
 function useRows(): Row[] {
   const g = useGraphicsStore();
   const volume = useAudioStore((s) => s.volume);
+  const assists = useAssistStore();
   const turntable = useAppStore((s) => s.turntable);
   const locale = useLocale();
   const onOff = (v: boolean) => (v ? t('ui.on') : t('ui.off'));
@@ -77,6 +79,24 @@ function useRows(): Row[] {
       label: t('ui.turntable'),
       value: onOff(turntable),
       step: () => useAppStore.getState().toggleTurntable(),
+    },
+    {
+      id: 'steeringAssist',
+      label: t('settings.steeringAssist'),
+      value: onOff(assists.steeringAssist),
+      step: () => assists.setAssist('steeringAssist', !assists.steeringAssist),
+    },
+    {
+      id: 'tractionControl',
+      label: t('settings.tractionControl'),
+      value: onOff(assists.tractionControl),
+      step: () => assists.setAssist('tractionControl', !assists.tractionControl),
+    },
+    {
+      id: 'abs',
+      label: t('settings.abs'),
+      value: onOff(assists.abs),
+      step: () => assists.setAssist('abs', !assists.abs),
     },
     {
       id: 'credits',

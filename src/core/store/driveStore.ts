@@ -28,6 +28,17 @@ export type DriveHud = {
   /** Nitro tüpü 0..1; null = nitro takılı değil */
   nitro: number | null;
   nitroActive: boolean;
+  /** Gaz / fren 0..1, el freni */
+  throttle: number;
+  brake: number;
+  handbrake: boolean;
+  /** Gövde kayma açısı (derece; düşük hızda 0) */
+  driftDeg: number;
+  /** ABS / çekiş kontrolü şu an müdahale ediyor */
+  absActive: boolean;
+  tcActive: boolean;
+  /** En iyi tura göre fark (sn, + yavaş); en iyi tur yoksa null */
+  lapDelta: number | null;
 };
 
 /** Duraklatma menüsünün gösterdiği sayfa */
@@ -74,6 +85,13 @@ export const initialHud = (): DriveHud => ({
   offTrack: false,
   nitro: null,
   nitroActive: false,
+  throttle: 0,
+  brake: 0,
+  handbrake: false,
+  driftDeg: 0,
+  absActive: false,
+  tcActive: false,
+  lapDelta: null,
 });
 
 export const useDriveStore = create<DriveState>()((set) => ({
