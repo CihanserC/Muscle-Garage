@@ -1,21 +1,28 @@
 # İlerleme
 
-## Durum: Fazlar 0–11 ve V2-1/V2-2 tamam; V2-3 büyük ölçüde tamam — bkz. `docs/PLAN_V2.md`, `docs/ANALYSIS.md`
+## Durum: Fazlar 0–11, V2-1…V2-3 ve V2-5 tamam; V2-4 kodu tamam (tarayıcıda doğrulanmadı); V2-6 kısmen — bkz. `docs/PLAN_V2.md`, `docs/ANALYSIS.md`
 
-## V2-3 kalanları + V2-4 mobil (kısmen) — 2026-11-02
+## V2-3 kalanları, V2-4 mobil, drift, V2-5 iç mekân, ek özellikler — 2026-11-02
 
-**Tamam, testli (431 test, lint ve derleme yeşil)**
+**Tamam, testli** (474 test; lint, tür kontrolü ve üretim derlemesi yeşil)
 
-- **ABS** (`assists.ts`): gövde kayma açısı ≈7°'yi aşınca fren kısılır (en fazla %45'e kadar), düz frenlemede ve el freninde dokunmaz. Ayrı bir boyuna kayma ölçümü olmadığı için yanal kaymaya göre çalışır.
-- **Yardımcı ayarları** (`assistStore.ts`, kalıcı): direksiyon yardımı, çekiş kontrolü, ABS; Ayarlar penceresinde ve duraklat menüsünde ("Ayarlar"). Varsayılan: TC kapalı, diğerleri açık.
-- **HUD:** gaz/fren çubukları, ABS/TC/HB lambaları, drift açısı, tur süresinin yanında en iyi tura fark (100 dilimli geçiş tablosu, `lap.ts`).
-- **Mobil altyapı:** `core/platform/device.ts` (`useLayout`), dokunmatikte ilk açılış kalitesi düşük ve dpr ≤ 1,5, `viewport-fit=cover`, safe-area, `100dvh`, tuvalde `touch-action: none`.
-- **Dokunmatik sürüş:** solda analog direksiyon bölgesi, sağda gaz/fren/el freni/nitro, üstte duraklat/kamera/geri koy; klavye + gamepad + dokunmatik "büyük olan kazanır" ile birleşir. Dikeyde "cihazı çevirin" katmanı, Wake Lock, arka plana geçince duraklat.
+- **ABS** (`assists.ts`): gövde kayma açısı ≈7°'yi aşınca fren kısılır (en fazla %45'e kadar); düz frenlemede ve el freninde dokunmaz. Ayrı boyuna kayma ölçümü olmadığı için yanal kaymaya göre çalışır. Başsız testler: virajda frenleme mesafesi ABS'siz ölçümün en fazla %5 fazlası, düz frenleme aynı (üç araç).
+- **Yardımcı ayarları** (`assistStore.ts`, kalıcı) Ayarlar penceresinde ve duraklat menüsünde. Varsayılan: TC kapalı, diğerleri açık.
+- **HUD:** gaz/fren çubukları, ABS/TC/HB lambaları, drift açısı, en iyi tura fark (100 dilimli geçiş tablosu, `lap.ts`).
+- **Drift** (`core/drive/drift.ts`, `VehiclePhysics.applyDrift`): Space (el freni) + direksiyon, ≥ 29 km/s'de açılır. Direksiyon hedef kayma açısını seçer (tam kilitte ≈34°); yalpalama hızı bu açıyı tutar, hız vektörü gövdeye yalnız zayıf hizalanır, arka el freni kuvveti %20'ye iner. Ölçüm (3 araç, 80 km/s, tam direksiyon + %60 gaz): kayma açısı ≈28–30° sabit, hız 3 sn'de ≈70 → 50–57 km/s, devrilme yok; Space bırakılınca 0,5 sn içinde kayma 0°. Direksiyonsuz el freni eskisi gibi fren yapar. **Dokunmatikte** fren düğmesi + direksiyon hızlıyken drift'e çevrilir (`touchBrakeToDrift`).
+- **Mobil:** cihaz algılama, düşük başlangıç kalitesi, dpr ≤ 1,5, `viewport-fit`/safe-area/`100dvh`; dokunmatik sürüş kontrolleri; dikey uyarısı, Wake Lock, arka planda duraklat; `autoQuality` dokunmatik eşikleri (50 FPS altı, 3 ölçüm); vinil tutamaçları 2×; araç seçiminde yatay kaydırma; **eğim (gyro) direksiyonu** (Ayarlar: kapalı/açık/ters, iOS izni); iOS ses kilidi için `touchend`/`click`.
+- **V2-5 Vanta iç mekânı** (`src/car/interior/`): ekstrüde kıvrımlı torpido, kuvözlü ve canlı (hız/devir, 10 Hz) gösterge kümesi, orta konsol + vites kolu + el freni, döner direksiyon (3 kol), şekilli koltuklar + kafalık + arka bench, kapı panelleri (kol dayama, kapı kolu, cam kolu), tavan döşemesi, dikiz aynası, pedallar, halı. Üçgen bütçesi testle korunur (< 40 bin; gerçek ≈ birkaç bin). Yakından detay, 7 m'den uzakta küçük parçalar gizlenir (LOD). **Kokpit kamerası** (C ile döngüde 5. kamera): sürücü gözü, yanal harekete bağlı hafif baş sallanması.
+- **Hayalet (ghost):** en iyi turun konum kaydı (20 Hz) araç başına saklanır, sonraki turlarda yarı saydam araç olarak oynar (`ghost.ts`, testli).
+- **Gün/gece seçimi** kalıcı ve Ayarlar'da.
+- **Paylaşım görseli:** fotoğraf PNG'sine build JSON'u tEXt parçası olarak gömülür; garajdan PNG ile içe aktarılır (`pngMeta.ts`, testli).
 
-**Yazıldı ama tarayıcıda doğrulanmadı** (Chrome bağlantısı koptu; pencere yeniden boyutlandırma görünümü değiştirmedi)
+**Yazıldı ama tarayıcıda hiç görülmedi** (Chrome bağlantısı koptu; pencere yeniden boyutlandırma görünümü değiştirmedi)
 
-- Dar ekran atölye düzeni (yan şerit/alt çekmece), mobil HUD yerleşimi, dokunmatik kontrollerin gerçek dokunmayla davranışı. İlk kontrol: 390×844, 844×390, 360×800, 1024×768.
-- Yapılmadı: gyro direksiyon, `autoQuality` eşiklerinin mobil için sıkılaştırılması, vinil gizmo tutamaçlarının büyütülmesi.
+- Dar ekran atölye düzeni, mobil HUD, dokunmatik kontroller, gyro yönü (işaret varsayımı: ters seçeneği var), araç seçiminde kaydırma, vinil tutamaç boyu.
+- Vanta iç mekânının görünümü (parça konumları ölçülere göre yazıldı, gözle ayarlanmadı), gösterge dokusu renkleri, kokpit kamerası göz konumları (Vanta için koltuğa göre; Mustang/BMW için **tahmin**), hayalet kutusunun hizası.
+- Üç araçta kalite kademelerinde FPS ölçümü (V2-6) yapılmadı.
+
+**Yapılmadı:** Mustang iç mekân/aksesuar iyileştirmesi (modelin kendi iç mekânı korunuyor), hava durumu seçimi, hayalet için gerçek araç modeli (şimdilik kutu), gerçek cihazda (iOS Safari dahil) test.
 
 ## Üçüncü araç + HUD ✅ (2026-10-20)
 

@@ -215,22 +215,22 @@ Her faz: uygula → test/lint/build → tarayıcıda doğrula → `PROGRESS.md` 
 ### V2-4 — Mobil uyumluluk
 
 - [x] Cihaz algılama (`core/platform/device.ts`), mobil kalite varsayılanı (low) + dpr ≤ 1,5, viewport/safe-area/dokunma ayarları
-- [~] Atölye düzeni: dar ekranda yan şerit (yatay) / alt çekmece (dikey), ≥44 px hedefler (CSS yazıldı, tarayıcıda DOĞRULANMADI)
-- [~] Dokunmatik sürüş kontrolleri (`TouchControls.tsx`, `touchInput.ts`, `core/input/touch.ts` testli) ve kompakt mobil HUD yazıldı, tarayıcıda DOĞRULANMADI; gyro yapılmadı
+- [~] Atölye düzeni: dar ekranda yan şerit (yatay) / alt çekmece (dikey), ≥44 px hedefler, vinil tutamaçları 2×, araç seçiminde kaydırma (yazıldı, tarayıcıda DOĞRULANMADI)
+- [~] Dokunmatik sürüş kontrolleri (`TouchControls.tsx`, `touchInput.ts`, `core/input/touch.ts` testli), kompakt mobil HUD ve eğim (gyro) direksiyonu yazıldı, tarayıcıda DOĞRULANMADI; fren + direksiyon dokunmatikte drift
 - [x] Dikey uyarısı, Wake Lock, arka planda otomatik duraklat (ses ilk dokunuşla açılma mevcut `pointerdown` yolunda)
 - [ ] Çoklu boyutta tarayıcı doğrulaması (390×844, 844×390, 360×800, 1024×768)
 
 ### V2-5 — Vanta iç mekân v2 + kokpit kamerası
 
-- [ ] Torpido, gösterge kümesi (canlı iğneler), konsol, vites kolu, direksiyon (döner)
-- [ ] Koltuk, kapı paneli, tavan döşemesi, pedallar, ışıklandırma
-- [ ] Kokpit kamerası (atölye iç kamerası + sürüş)
-- [ ] LOD ve üçgen bütçesi ölçümü
+- [x] Torpido, gösterge kümesi (canlı iğneler), konsol, vites kolu, direksiyon (döner) (2026-11-02; görsel doğrulama yok)
+- [~] Koltuk, kapı paneli, tavan döşemesi, pedallar ✅; iç mekân ışığı (ambient/gece parlaması) yapılmadı
+- [~] Sürüşte kokpit kamerası ✅ (göz konumları tahmin); atölye iç kamerası zaten vardı, yeni kabine göre ayarlanmadı
+- [x] LOD (7 m) ve üçgen bütçesi testi (`cabinGeometry.test.ts`)
 
 ### V2-6 — Genel cila ve rapor
 
-- [ ] Mustang iç mekân/aksesuar iyileştirmeleri (modelin kendi iç mekânı korunur)
-- [ ] Performans ölçümü (iki araç, kalite kademeleri), `ANALYSIS.md`/`PROGRESS.md` güncelleme
+- [ ] Mustang iç mekân/aksesuar iyileştirmeleri (yapılmadı; modelin kendi iç mekânı korunuyor)
+- [~] `ANALYSIS.md`/`PROGRESS.md` güncellendi ✅; performans ölçümü (araçlar × kalite kademeleri) tarayıcı olmadan yapılamadı
 - [ ] Bu belgenin sonuç bölümü
 
 ---
@@ -239,10 +239,10 @@ Her faz: uygula → test/lint/build → tarayıcıda doğrula → `PROGRESS.md` 
 
 | Öneri                                                                  | Değer                          | Maliyet | Durum                     |
 | ---------------------------------------------------------------------- | ------------------------------ | ------- | ------------------------- |
-| Araç başına **ghost/en iyi tur** kaydı ve tur karşılaştırması          | Yüksek (tekrar oynanabilirlik) | Orta    | V2-6 sonrası aday         |
-| **Gün/gece + hava** seçeneğinin pist öncesi seçimi                     | Orta                           | Düşük   | Aday                      |
+| Araç başına **ghost/en iyi tur** kaydı ve tur karşılaştırması          | Yüksek (tekrar oynanabilirlik) | Orta    | ✅ yapıldı (kutu hayalet)  |
+| **Gün/gece + hava** seçeneğinin pist öncesi seçimi                     | Orta                           | Düşük   | ✅ gün/gece; hava yok      |
 | Gerçek model dokularının **KTX2/WebP** sıkıştırması (`gltf-transform`) | Yüksek (yükleme)               | Düşük   | V2-2'de ölçüme göre       |
-| **Paylaşım görseli** (build JSON'u PNG metaverisine göm)               | Orta                           | Düşük   | Aday                      |
+| **Paylaşım görseli** (build JSON'u PNG metaverisine göm)               | Orta                           | Düşük   | ✅ yapıldı                 |
 | Üçüncü araç (BMW M3 GTR dosyası mevcut, 18,9 MB, lisansı bilinmiyor)   | Orta                           | Orta    | Lisans/boyut doğrulanınca |
 | Erişilebilirlik: renk körü paleti, yazı ölçeği, tek elle oynanış       | Orta                           | Düşük   | Mobil ile birlikte kısmen |
 | Çoklu dil (İngilizce) — i18n altyapısı hazır                           | Orta                           | Düşük   | Aday                      |

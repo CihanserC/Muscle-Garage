@@ -37,6 +37,14 @@ Kabul ölçütleri (`npm run lint`, `npm test`, `npm run build`): hepsi yeşil �
 - **Performans:** Mustang GLB %77 küçük (meshopt + WebP), statik mesh birleştirme ile çizim çağrısı yarıya indi.
 - **Testler:** 398 / 44 dosya.
 
+## 1d. Güncelleme (2026-11-02)
+
+- **Sürüş:** ABS, drift modu (Space + direksiyon; dokunmatikte fren + direksiyon), yardımcıların Ayarlar'dan kalıcı aç/kapa'sı. Üç araçta başsız testler.
+- **HUD:** pedal çubukları, ABS/TC/HB lambaları, drift açısı, en iyi tura fark; hayalet (en iyi tur) oynatma.
+- **Mobil:** dokunmatik sürüş kontrolleri, kompakt düzen/HUD, düşük başlangıç kalitesi, eğim direksiyonu, kaydırmalı araç seçimi, dikey uyarısı, Wake Lock. **Tarayıcıda/cihazda doğrulanmadı.**
+- **Vanta iç mekânı v2** ve kokpit kamerası; paylaşım görseli (PNG'ye gömülü build); kalıcı gün/gece.
+- **Testler:** 474 / 53 dosya. Açık: mobil/iç mekân görsel doğrulaması, kalite kademelerinde FPS ölçümü, Mustang iç mekânı, hava durumu, gerçek cihaz testi. Ayrıntı: `docs/PROGRESS.md`.
+
 ## 2. Mimari
 
 - **Veri odaklı:** araç manifesti, parça kataloğu, boya/jant/duruş/performans/pist verileri JSON; kodda sihirli sayı yok (görsel ayarlar `sceneConfig`, `materialConfig`, fizik sabitleri adlandırılmış sabitlerde).
