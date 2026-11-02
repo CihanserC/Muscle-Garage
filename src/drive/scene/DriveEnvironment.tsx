@@ -100,16 +100,16 @@ export function DriveEnvironment({
           <>
             <Lightformer
               form="rect"
-              intensity={1.4}
-              color="#7f9cff"
+              intensity={3}
+              color="#8fa8ff"
               position={l.sunDirection.clone().multiplyScalar(30).toArray()}
               scale={[14, 6, 1]}
               target={[0, 0, 0]}
             />
             <Lightformer
               form="rect"
-              intensity={0.4}
-              color="#1b2650"
+              intensity={1.2}
+              color="#3a4a8a"
               position={[0, 20, 0]}
               rotation-x={Math.PI / 2}
               scale={[40, 40, 1]}

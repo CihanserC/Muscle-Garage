@@ -18,6 +18,7 @@ import { volumeLabel } from '../../audio/volumeLabel';
 import { DRIVE_CAMERAS, useDriveStore } from '../../core/store/driveStore';
 import { useGraphicsStore } from '../../core/store/graphicsStore';
 import { useLayout } from '../../core/platform/device';
+import { resolveTouch, useHudStore } from '../../core/store/hudStore';
 import { t } from '../../i18n';
 import { TouchControls } from './TouchControls';
 import './drive.css';
@@ -198,6 +199,7 @@ function NitroGauge() {
         <span style={{ height: `${level * 100}%` }} />
       </div>
       <div className="dv-nitro-label">N₂O</div>
+      <div className="dv-nitro-key">Shift</div>
     </div>
   );
 }
@@ -238,6 +240,7 @@ function Hud() {
   const hud = useDriveStore((s) => s.hud);
   const fps = useGraphicsStore((s) => s.fps);
   const showFps = useGraphicsStore((s) => s.showFps);
+  const showLamps = useHudStore((s) => s.showLamps);
   const lap = hud.lap;
   return (
     <>
@@ -273,7 +276,7 @@ function Hud() {
       <Speedometer />
       <NitroGauge />
       <Pedals />
-      <Lamps />
+      {showLamps && <Lamps />}
       {!lap.running && <div className="dv-banner">{t('drive.crossLine')}</div>}
       {hud.offTrack && <div className="dv-banner is-warn">{t('drive.offTrack')}</div>}
       <div className="dv-menu-hint">
@@ -496,9 +499,12 @@ export function DriveOverlay() {
   useDriveLifecycle();
   const ready = useDriveStore((s) => s.ready);
   const paused = useDriveStore((s) => s.paused);
-  const { isTouch, isPortrait } = useLayout();
+  const layout = useLayout();
+  const scheme = useHudStore((st) => st.controlScheme);
+  const isTouch = resolveTouch(scheme, layout.isTouch);
+  const isPortrait = layout.isPortrait;
   return (
-    <div className="dv-root">
+    <div className={`dv-root${isTouch ? ' is-touch' : ''}`}>
       {ready ? <Hud /> : <div className="dv-loading">{t('drive.loading')}</div>}
       {ready && isTouch && !paused && !isPortrait && <TouchControls />}
       {isTouch && isPortrait && <div className="dv-rotate">{t('touch.rotate')}</div>}

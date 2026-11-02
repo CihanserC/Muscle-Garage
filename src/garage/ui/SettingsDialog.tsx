@@ -6,6 +6,7 @@ import { TILT_MODES } from '../../core/input/tilt';
 import { disableGyro, enableGyro } from '../../drive/gyroInput';
 import { useAssistStore } from '../../core/store/assistStore';
 import { useDriveStore } from '../../core/store/driveStore';
+import { CONTROL_SCHEMES, useHudStore } from '../../core/store/hudStore';
 import { useInputStore } from '../../core/store/inputStore';
 import { useAudioStore } from '../../core/store/audioStore';
 import { QUALITY_LEVELS, TONE_MAPPINGS, useGraphicsStore } from '../../core/store/graphicsStore';
@@ -35,6 +36,7 @@ function useRows(): Row[] {
   const assists = useAssistStore();
   const tilt = useInputStore((st) => st.tilt);
   const timeOfDay = useDriveStore((st) => st.timeOfDay);
+  const hud = useHudStore();
   const turntable = useAppStore((s) => s.turntable);
   const locale = useLocale();
   const onOff = (v: boolean) => (v ? t('ui.on') : t('ui.off'));
@@ -104,6 +106,24 @@ function useRows(): Row[] {
       label: t('settings.abs'),
       value: onOff(assists.abs),
       step: () => assists.setAssist('abs', !assists.abs),
+    },
+    {
+      id: 'controls',
+      label: t('settings.controls'),
+      value: t(`controls.${hud.controlScheme}`),
+      step: (d: -1 | 1) => hud.setControlScheme(cycle(CONTROL_SCHEMES, hud.controlScheme, d)),
+    },
+    {
+      id: 'lamps',
+      label: t('settings.lamps'),
+      value: onOff(hud.showLamps),
+      step: () => hud.setShowLamps(!hud.showLamps),
+    },
+    {
+      id: 'ghost',
+      label: t('settings.ghost'),
+      value: onOff(hud.showGhost),
+      step: () => hud.setShowGhost(!hud.showGhost),
     },
     {
       id: 'timeOfDay',

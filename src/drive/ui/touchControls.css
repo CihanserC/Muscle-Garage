@@ -147,41 +147,48 @@
   pointer-events: auto;
 }
 
-/* Mobil HUD: kompakt, dokunmatik kontrollerle çakışmaz */
-@media (max-width: 820px), (max-height: 500px) {
-  .dv-lap {
-    top: calc(8px + var(--safe-top, 0px));
-    left: calc(8px + var(--safe-left, 0px));
-    padding: 4px 8px 6px;
-    transform: scale(0.82);
-    transform-origin: top left;
-  }
+/* Mobil HUD (yalnız ekran kontrolleri açıkken): kompakt, dokunmatik kontrollerle çakışmaz */
+.dv-root.is-touch .dv-lap {
+  top: calc(8px + var(--safe-top, 0px));
+  left: calc(8px + var(--safe-left, 0px));
+  padding: 4px 8px 6px;
+  transform: scale(0.82);
+  transform-origin: top left;
+}
 
-  .dv-topright {
-    top: calc(8px + var(--safe-top, 0px));
-    right: calc(8px + var(--safe-right, 0px));
-    transform: scale(0.62);
-    transform-origin: top right;
-  }
+.dv-root.is-touch .dv-topright {
+  top: calc(8px + var(--safe-top, 0px));
+  right: calc(8px + var(--safe-right, 0px));
+  transform: scale(0.62);
+  transform-origin: top right;
+}
 
-  .dv-speedo {
-    right: 50%;
-    bottom: calc(4px + var(--safe-bottom, 0px));
-    transform: translateX(50%) scale(0.56);
-    transform-origin: bottom center;
-  }
+.dv-root.is-touch .dv-speedo {
+  right: 50%;
+  bottom: calc(4px + var(--safe-bottom, 0px));
+  transform: translateX(50%) scale(0.56);
+  transform-origin: bottom center;
+}
 
-  .dv-nitro {
-    right: auto;
-    left: calc(50% + 72px);
-    bottom: calc(10px + var(--safe-bottom, 0px));
-    transform: scale(0.6);
-    transform-origin: bottom left;
-  }
+.dv-root.is-touch .dv-nitro {
+  right: auto;
+  left: calc(50% + 72px);
+  bottom: calc(10px + var(--safe-bottom, 0px));
+  transform: scale(0.6);
+  transform-origin: bottom left;
+}
 
-  .dv-pedals,
-  .dv-lamps,
-  .dv-menu-hint {
-    display: none;
-  }
+.dv-root.is-touch .dv-pedals,
+.dv-root.is-touch .dv-lamps,
+.dv-root.is-touch .dv-menu-hint,
+.dv-root.is-touch .dv-nitro-key {
+  display: none;
+}
+
+/* Klavye düzeni: nitro tüpünün altında tuş ipucu */
+.dv-nitro-key {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(216, 213, 206, 0.7);
 }

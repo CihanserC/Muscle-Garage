@@ -12,7 +12,7 @@ import { useAssistStore } from '../../core/store/assistStore';
 import { touchState } from '../touchInput';
 import { useEffect, useRef, useState, type RefObject } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Quaternion, SpotLight, Vector3, type Group } from 'three';
+import { Quaternion, Vector3, type Group, type Material, type Mesh } from 'three';
 import { CarRig } from '../../car/CarRig';
 import type { WheelPose } from '../../car/wheelPose';
 import {
@@ -28,10 +28,12 @@ import {
 import type { Track } from '../../core/drive/track';
 import { deriveVehicleSpec } from '../../core/drive/vehicleSpec';
 import { useAudioStore } from '../../core/store/audioStore';
-import { useDriveStore } from '../../core/store/driveStore';
+import { DRIVE_CAMERAS, useDriveStore } from '../../core/store/driveStore';
+import { useHudStore } from '../../core/store/hudStore';
 import { useBuildStore } from '../../core/store/stores';
 import { getCar } from '../../data/cars';
 import { EngineAudio } from '../audio/EngineAudio';
+import { NightLights } from './NightLights';
 import { DriveCamera } from '../camera/DriveCamera';
 import { VehicleEffects } from '../fx/VehicleEffects';
 import { createInputSource, type InputSource } from '../input';
@@ -42,7 +44,9 @@ import { PHYSICS_STEP, VehiclePhysics, type VehicleSnapshot } from '../physics/V
 const MAX_STEPS_PER_FRAME = 10;
 /** HUD güncelleme aralığı (sn) */
 const HUD_INTERVAL = 0.08;
-const HEADLIGHT = { x: 0.62, y: 0.72, reach: 28, angle: 0.5, penumbra: 0.6, intensity: 420 };
+
+/** Cam materyali adları (paylaşılan mat_glass ve modellerin kendi cam materyalleri) */
+const GLASS_NAME = /^(mat_glass|GLS_Clear|GLS_WindScreen)$|Glass1$/;
 
 const tmpQuat = new Quaternion();
 const tmpForward = new Vector3();
@@ -52,53 +56,6 @@ type DriveDebug = {
   input: InputSource | null;
   physics: VehiclePhysics | null;
 };
-
-function Headlights({
-  rigRef,
-  halfLength,
-  strong,
-}: {
-  rigRef: RefObject<Group | null>;
-  halfLength: number;
-  strong: boolean;
-}) {
-  const left = useRef<SpotLight>(null);
-  const right = useRef<SpotLight>(null);
-  useEffect(() => {
-    const g = rigRef.current;
-    const spots = [left.current, right.current];
-    if (!g) return;
-    spots.forEach((s, i) => {
-      if (!s) return;
-      const side = i === 0 ? 1 : -1;
-      g.add(s.target);
-      s.target.position.set(side * HEADLIGHT.x * 0.7, 0, halfLength + HEADLIGHT.reach);
-    });
-    return () => {
-      spots.forEach((s) => s && g.remove(s.target));
-    };
-  }, [rigRef, halfLength]);
-  // Gündüz (gün batımı) farlar yanmaz: yakın zemin ışığı patlar.
-  if (!strong) return null;
-  const intensity = HEADLIGHT.intensity;
-  return (
-    <>
-      {[1, -1].map((side) => (
-        <spotLight
-          key={side}
-          ref={side === 1 ? left : right}
-          position={[side * HEADLIGHT.x, HEADLIGHT.y, halfLength - 0.1]}
-          angle={HEADLIGHT.angle}
-          penumbra={HEADLIGHT.penumbra}
-          intensity={intensity}
-          distance={HEADLIGHT.reach * 2}
-          decay={2}
-          color="#fff1d0"
-        />
-      ))}
-    </>
-  );
-}
 
 /**
  * Atölyedeki build'i fizikli araca çevirir: Rapier gövdesi, kamera, efektler, ses, HUD ve tur zamanı.
@@ -302,7 +259,7 @@ export function DriveCar({
         ghost.current && lap.current.running
           ? ghostPose(ghost.current, ph.time - lap.current.lapStartTime)
           : null;
-      gg.visible = pose !== null;
+      gg.visible = pose !== null && useHudStore.getState().showGhost;
       if (pose) {
         gg.position.set(pose[0], snap.position[1] - ph.restHeight, pose[1]);
         gg.rotation.y = pose[2];
@@ -360,6 +317,27 @@ export function DriveCar({
     }
   });
 
+  // Kokpit kamerasında camlar gizlenir: yol camın filmi/yansımasıyla kararmasın
+  const cameraIndex = useDriveStore((st) => st.cameraIndex);
+  useEffect(() => {
+    const g = rig.current;
+    if (!g) return;
+    const cockpit = DRIVE_CAMERAS[cameraIndex] === 'cockpit';
+    const glass: Material[] = [];
+    g.traverse((o) => {
+      if (!('isMesh' in o) || !(o as Mesh).isMesh) return;
+      for (const m of [(o as Mesh).material].flat())
+        if (GLASS_NAME.test(m.name) && !glass.includes(m)) glass.push(m);
+    });
+    glass.forEach((m) => {
+      m.visible = !cockpit;
+    });
+    return () =>
+      glass.forEach((m) => {
+        m.visible = true;
+      });
+  }, [cameraIndex, restHeight]);
+
   const ready = restHeight !== null;
   const halfLength = car.body.halfLength;
   return (
@@ -374,7 +352,12 @@ export function DriveCar({
         {ready && (
           <group ref={rig} position-y={-restHeight}>
             <CarRig drive={{ poses }} />
-            <Headlights rigRef={rig} halfLength={halfLength} strong={timeOfDay === 'night'} />
+            <NightLights
+              rigRef={rig}
+              carId={build.carId}
+              halfLength={halfLength}
+              night={timeOfDay === 'night'}
+            />
           </group>
         )}
       </group>
