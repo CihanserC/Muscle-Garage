@@ -6,6 +6,12 @@ import {
   type DriveInput,
   type DrivetrainState,
 } from '../../core/drive/drivetrain';
+import {
+  DRIFT_HANDBRAKE_FACTOR,
+  driftAlignRate,
+  driftYawTarget,
+  isDrifting,
+} from '../../core/drive/drift';
 import { computeBarriers } from '../../core/drive/barriers';
 import { GANTRY_PILLAR_M, startGantry } from '../../core/drive/scenery';
 import {
@@ -302,7 +308,10 @@ export class VehiclePhysics {
     // Fren: ön/arka dağılım, el freni arkayı kilitler
     const brakeForce = o.brake * spec.brakeForcePerWheel;
     // Düşük hızda el freni arka tekerlekleri tamamen tutar (burnout); hızlıyken kaydırır (drift).
-    const handbrake = input.handbrake ? spec.brakeForcePerWheel * (speed < 3 ? 3.2 : 1.1) : 0;
+    const drifting = isDrifting(input.handbrake, this.steer, speed) && forwardSpeed > 0;
+    const handbrake = input.handbrake
+      ? spec.brakeForcePerWheel * (speed < 3 ? 3.2 : drifting ? 1.1 * DRIFT_HANDBRAKE_FACTOR : 1.1)
+      : 0;
 
     let surfaceMain: Surface = 'asphalt';
     const wheels: { surface: Surface; contact: boolean }[] = [];
@@ -510,6 +519,10 @@ export class VehiclePhysics {
       Math.max(0, (v - ARCADE_MIN_SPEED) / (ARCADE_FULL_SPEED - ARCADE_MIN_SPEED)),
     );
     if (fade <= 0) return;
+    if (forwardSpeed > 0 && isDrifting(input.handbrake, this.steer, v)) {
+      this.applyDrift(dt, v);
+      return;
+    }
     const scale = input.handbrake ? ARCADE_HANDBRAKE_SCALE : 1;
     const direction = Math.sign(forwardSpeed);
     // Hedef yalpalama: kinematik sınır (tam kilit) ile hedef yanal ivme sınırının küçüğü
@@ -542,6 +555,42 @@ export class VehiclePhysics {
         x: (Math.sin(next) * speed - vel.x) * mass,
         y: 0,
         z: (Math.cos(next) * speed - vel.z) * mass,
+      },
+      true,
+    );
+  }
+
+  /**
+   * Drift modu: direksiyonla hedef kayma açısı (gövde–hız farkı) seçilir; yalpalama hızı bu açıyı
+   * tutacak şekilde sürülür, hız vektörü gövdeye yalnız zayıfça hizalanır (kayma sürer, hız korunur).
+   */
+  private applyDrift(dt: number, speed: number): void {
+    const { chassis, spec } = this;
+    const vel = chassis.linvel();
+    const horizontal = Math.hypot(vel.x, vel.z);
+    if (horizontal < 0.5) return;
+    const q = chassis.rotation();
+    const fwd = quatRotate(q, { x: 0, y: 0, z: 1 });
+    const heading = Math.atan2(fwd.x, fwd.z);
+    const course = Math.atan2(vel.x, vel.z);
+    let beta = heading - course;
+    while (beta > Math.PI) beta -= 2 * Math.PI;
+    while (beta < -Math.PI) beta += 2 * Math.PI;
+
+    const target = driftYawTarget(this.steer, beta, speed, spec.driving.arcadeLateralAccel);
+    const w = chassis.angvel();
+    const inertia = chassis.principalInertia().y;
+    const blend = Math.min(1, spec.driving.yawResponse * dt);
+    chassis.applyTorqueImpulse({ x: 0, y: inertia * (target - w.y) * blend, z: 0 }, true);
+
+    const turn = beta * Math.min(1, driftAlignRate(this.steer, beta) * dt);
+    const next = course + turn;
+    const mass = chassis.mass();
+    chassis.applyImpulse(
+      {
+        x: (Math.sin(next) * horizontal - vel.x) * mass,
+        y: 0,
+        z: (Math.cos(next) * horizontal - vel.z) * mass,
       },
       true,
     );

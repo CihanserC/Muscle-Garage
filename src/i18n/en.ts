@@ -268,7 +268,7 @@ export const en: Record<string, string> = {
   'drive.controls.steer': 'Steering',
   'drive.controls.padStick': 'Left stick',
   'drive.controls.space': 'Space',
-  'drive.controls.handbrake': 'Handbrake',
+  'drive.controls.handbrake': 'Handbrake · drift (with steering)',
   'drive.controls.camera': 'Change camera',
   'drive.controls.reset': 'Reset onto track',
   'drive.controls.time': 'Sunset / night',

@@ -268,7 +268,7 @@ export const tr: Record<string, string> = {
   'drive.controls.steer': 'Direksiyon',
   'drive.controls.padStick': 'Sol çubuk',
   'drive.controls.space': 'Boşluk',
-  'drive.controls.handbrake': 'El freni',
+  'drive.controls.handbrake': 'El freni · drift (direksiyonla)',
   'drive.controls.camera': 'Kamera değiştir',
   'drive.controls.reset': 'Pistte düzelt',
   'drive.controls.time': 'Gün batımı / gece',

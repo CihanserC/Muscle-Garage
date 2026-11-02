@@ -1,5 +1,7 @@
 import { applyAssists } from '../../core/drive/assists';
+import { touchBrakeToDrift } from '../../core/input/touch';
 import { useAssistStore } from '../../core/store/assistStore';
+import { touchState } from '../touchInput';
 import { useEffect, useRef, useState, type RefObject } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Quaternion, SpotLight, Vector3, type Group } from 'three';
@@ -201,8 +203,10 @@ export function DriveCar({
     if (!store.paused) {
       acc.current += Math.min(delta, 0.1);
       let steps = 0;
-      const raw = input.current?.read() ?? { throttle: 0, brake: 0, steer: 0, handbrake: false };
       const prev = snapshotRef.current;
+      const read = input.current?.read() ?? { throttle: 0, brake: 0, steer: 0, handbrake: false };
+      // Dokunmatikte fren düğmesi + direksiyon hızlıyken drift başlatır
+      const raw = prev && touchState.brake > 0 ? touchBrakeToDrift(read, prev.speed) : read;
       const drive = prev
         ? applyAssists(
             raw,

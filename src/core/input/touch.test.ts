@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { steerFromPointer } from './touch';
+import { steerFromPointer, touchBrakeToDrift } from './touch';
 
 describe('steerFromPointer', () => {
   it('ortada düz', () => {
@@ -21,5 +21,23 @@ describe('steerFromPointer', () => {
   });
   it('genişlik 0 ise 0', () => {
     expect(steerFromPointer(10, 0, 0)).toBe(0);
+  });
+});
+
+describe('touchBrakeToDrift', () => {
+  const braking = { throttle: 1, brake: 1, steer: 0.8, handbrake: false };
+  it('hızlıyken fren + direksiyon el frenine (drift) çevrilir', () => {
+    const out = touchBrakeToDrift(braking, 20);
+    expect(out.handbrake).toBe(true);
+    expect(out.brake).toBe(0);
+    expect(out.steer).toBe(0.8);
+  });
+  it('yavaşken ya da direksiyon yokken normal fren', () => {
+    expect(touchBrakeToDrift(braking, 3)).toEqual(braking);
+    expect(touchBrakeToDrift({ ...braking, steer: 0 }, 20)).toEqual({ ...braking, steer: 0 });
+  });
+  it('fren yoksa dokunmaz', () => {
+    const idle = { ...braking, brake: 0 };
+    expect(touchBrakeToDrift(idle, 20)).toEqual(idle);
   });
 });

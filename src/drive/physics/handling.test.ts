@@ -143,6 +143,32 @@ describe.each(listCars().map((c) => c.manifest.id))('sürüş testleri: %s', (id
     v.dispose();
   });
 
+  it('Space + direksiyon hızlıyken kontrollü drift başlatır, hız korunur, bırakınca düzelir', () => {
+    const slipDeg = (v: VehiclePhysics) => {
+      const s = v.snapshot();
+      return (Math.atan2(Math.abs(s.lateralSpeed), Math.abs(s.forwardSpeed)) * 180) / Math.PI;
+    };
+    const v = launch(id, 80 / 3.6);
+    const v0 = v.snapshot().speed;
+    step(v, 2, input({ throttle: 0.6, steer: 1, handbrake: true }));
+    const drift = v.snapshot();
+    expect(slipDeg(v)).toBeGreaterThan(15);
+    expect(slipDeg(v)).toBeLessThan(45);
+    expect(drift.speed).toBeGreaterThan(v0 * 0.5);
+    expect(drift.upY).toBeGreaterThan(0.9);
+    step(v, 1.5, input({ throttle: 0.6 }));
+    expect(slipDeg(v)).toBeLessThan(5);
+    v.dispose();
+  });
+
+  it('el freni direksiyonsuz fren yapar (drift değil)', () => {
+    const v = launch(id, 80 / 3.6);
+    step(v, 1, input({ handbrake: true }));
+    expect(v.snapshot().speed).toBeLessThan(80 / 3.6);
+    expect(Math.abs(v.snapshot().lateralSpeed)).toBeLessThan(2);
+    v.dispose();
+  });
+
   it('tam hızda ani tam direksiyon devirmez', () => {
     const v = launch(id, 45);
     step(v, 3, input({ steer: 1 }));
