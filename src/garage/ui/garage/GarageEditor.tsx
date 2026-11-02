@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { extractPngText, PNG_BUILD_KEYWORD } from '../../../core/storage/pngMeta';
 import { useGarageStore } from '../../../core/store/garageStore';
 import { useBuildStore } from '../../../core/store/stores';
 import { exportBuildJson, exportFileName } from '../../../core/storage/garageService';
@@ -117,7 +118,13 @@ function JsonSection() {
   };
   const readFile = async (f: File | undefined) => {
     if (!f) return;
-    importText(await f.text());
+    if (f.type === 'image/png' || f.name.toLowerCase().endsWith('.png')) {
+      // Paylaşım görseli: build JSON'u PNG metaverisinde
+      const json = extractPngText(new Uint8Array(await f.arrayBuffer()), PNG_BUILD_KEYWORD);
+      if (json === null) {
+        useGarageStore.setState({ notice: { kind: 'error', key: 'garage.error.noPngData' } });
+      } else importText(json);
+    } else importText(await f.text());
     if (file.current) file.current.value = '';
   };
 
@@ -136,7 +143,7 @@ function JsonSection() {
         <input
           ref={file}
           type="file"
-          accept=".json,application/json"
+          accept=".json,application/json,.png,image/png"
           hidden
           onChange={(e) => void readFile(e.target.files?.[0])}
         />
