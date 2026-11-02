@@ -151,14 +151,14 @@ export function DriveCar({
   }, []);
 
   useEffect(() => {
-    const a = new EngineAudio(exhaust, build.carId);
+    const a = new EngineAudio(exhaust);
     a.start();
     audio.current = a;
     return () => {
       a.stop();
       audio.current = null;
     };
-  }, [exhaust, build.carId]);
+  }, [exhaust]);
 
   useEffect(() => {
     if (restartTick === 0) return;
