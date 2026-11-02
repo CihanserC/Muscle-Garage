@@ -1,4 +1,12 @@
 import { applyAssists } from '../../core/drive/assists';
+import {
+  ghostPose,
+  loadGhost,
+  recordGhost,
+  saveGhost,
+  type Ghost,
+  type GhostSample,
+} from '../../core/drive/ghost';
 import { touchBrakeToDrift } from '../../core/input/touch';
 import { useAssistStore } from '../../core/store/assistStore';
 import { touchState } from '../touchInput';
@@ -127,6 +135,10 @@ export function DriveCar({
   const bestSplits = useRef<LapSplits | null>(null);
   /** ABS / çekiş kontrolü son adımda girişi kıstı mı (HUD lambaları) */
   const assistFlags = useRef({ abs: false, tc: false });
+  /** En iyi turun hayaleti (kayıtlı) ve bu turun kayıt tamponu */
+  const ghost = useRef<Ghost | null>(null);
+  const ghostGroup = useRef<Group>(null);
+  const recording = useRef<GhostSample[]>([]);
   const acc = useRef(0);
   const hudClock = useRef(0);
   const supercharged = build.parts.engine === 'blower_v8';
@@ -144,6 +156,8 @@ export function DriveCar({
       lap.current = initialLap();
       curSplits.current = emptySplits();
       bestSplits.current = null;
+      ghost.current = loadGhost(build.carId);
+      recording.current = [];
       setRestHeight(created.restHeight);
       useDriveStore.getState().setReady(true);
     });
@@ -194,6 +208,7 @@ export function DriveCar({
     physics.current?.reset(null);
     lap.current = { ...initialLap(), bestLap: lap.current.bestLap, lastLap: lap.current.lastLap };
     curSplits.current = emptySplits();
+    recording.current = [];
   }, [restartTick]);
   useEffect(() => {
     if (respawnTick > 0) physics.current?.resetOnTrack();
@@ -254,15 +269,43 @@ export function DriveCar({
       const after = lap.current;
       if (after.lapStartTime !== before.lapStartTime || after.running !== before.running) {
         // Tur bitti: en iyi tur yenilendiyse dilimleri en iyi olarak sakla
-        if (after.laps > before.laps && after.lastLap === after.bestLap)
+        if (after.laps > before.laps && after.lastLap === after.bestLap) {
           bestSplits.current = curSplits.current;
+          const best = { lapTime: after.lastLap as number, samples: recording.current };
+          ghost.current = best;
+          saveGhost(build.carId, best);
+        }
         curSplits.current = emptySplits();
+        recording.current = [];
       } else if (after.running) {
         recordSplit(
           curSplits.current,
           lapFraction(after.lastRel, track.length),
           ph.time - after.lapStartTime,
         );
+        const [qx, , qz, qw] = snap.quaternion;
+        const qy = snap.quaternion[1];
+        recordGhost(
+          recording.current,
+          ph.time - after.lapStartTime,
+          snap.position[0],
+          snap.position[2],
+          Math.atan2(2 * (qx * qz + qw * qy), 1 - 2 * (qx * qx + qy * qy)),
+        );
+      }
+    }
+
+    // Hayalet: en iyi turu oynat (tur süresi akarken)
+    const gg = ghostGroup.current;
+    if (gg) {
+      const pose =
+        ghost.current && lap.current.running
+          ? ghostPose(ghost.current, ph.time - lap.current.lapStartTime)
+          : null;
+      gg.visible = pose !== null;
+      if (pose) {
+        gg.position.set(pose[0], snap.position[1] - ph.restHeight, pose[1]);
+        gg.rotation.y = pose[2];
       }
     }
 
@@ -321,6 +364,12 @@ export function DriveCar({
   const halfLength = car.body.halfLength;
   return (
     <>
+      <group ref={ghostGroup} visible={false}>
+        <mesh position-y={0.55}>
+          <boxGeometry args={[1.9, 1, halfLength * 2]} />
+          <meshBasicMaterial color="#5fd0ff" transparent opacity={0.25} depthWrite={false} />
+        </mesh>
+      </group>
       <group ref={carGroupRef}>
         {ready && (
           <group ref={rig} position-y={-restHeight}>

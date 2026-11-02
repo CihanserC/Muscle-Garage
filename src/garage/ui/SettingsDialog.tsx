@@ -5,6 +5,7 @@ import { currentLayout } from '../../core/platform/device';
 import { TILT_MODES } from '../../core/input/tilt';
 import { disableGyro, enableGyro } from '../../drive/gyroInput';
 import { useAssistStore } from '../../core/store/assistStore';
+import { useDriveStore } from '../../core/store/driveStore';
 import { useInputStore } from '../../core/store/inputStore';
 import { useAudioStore } from '../../core/store/audioStore';
 import { QUALITY_LEVELS, TONE_MAPPINGS, useGraphicsStore } from '../../core/store/graphicsStore';
@@ -33,6 +34,7 @@ function useRows(): Row[] {
   const volume = useAudioStore((s) => s.volume);
   const assists = useAssistStore();
   const tilt = useInputStore((st) => st.tilt);
+  const timeOfDay = useDriveStore((st) => st.timeOfDay);
   const turntable = useAppStore((s) => s.turntable);
   const locale = useLocale();
   const onOff = (v: boolean) => (v ? t('ui.on') : t('ui.off'));
@@ -102,6 +104,12 @@ function useRows(): Row[] {
       label: t('settings.abs'),
       value: onOff(assists.abs),
       step: () => assists.setAssist('abs', !assists.abs),
+    },
+    {
+      id: 'timeOfDay',
+      label: t('drive.pause.time'),
+      value: t(`timeOfDay.${timeOfDay}`),
+      step: () => useDriveStore.getState().toggleTimeOfDay(),
     },
     // Eğim sensörü yalnız dokunmatik cihazlarda anlamlı
     ...(currentLayout().isTouch

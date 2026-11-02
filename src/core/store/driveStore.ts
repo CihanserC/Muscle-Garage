@@ -8,6 +8,26 @@ export type DriveCamera = (typeof DRIVE_CAMERAS)[number];
 export const TIMES_OF_DAY = ['sunset', 'night'] as const;
 export type TimeOfDay = (typeof TIMES_OF_DAY)[number];
 
+const TIME_KEY = 'muscle-garage.timeOfDay';
+
+/** Kayıtlı gün/gece seçimi (yoksa ya da erişilemezse gün batımı). */
+export function loadTimeOfDay(): TimeOfDay {
+  try {
+    const v = localStorage.getItem(TIME_KEY);
+    return TIMES_OF_DAY.includes(v as TimeOfDay) ? (v as TimeOfDay) : 'sunset';
+  } catch {
+    return 'sunset';
+  }
+}
+
+function saveTimeOfDay(v: TimeOfDay): void {
+  try {
+    localStorage.setItem(TIME_KEY, v);
+  } catch {
+    // saklanamadı: yalnız bu oturumda geçerli
+  }
+}
+
 /** HUD'a basılan anlık değerler (düşük sıklıkla güncellenir). */
 export type DriveHud = {
   speedKmh: number;
@@ -102,7 +122,7 @@ export const useDriveStore = create<DriveState>()((set) => ({
   paused: false,
   pauseView: 'main',
   cameraIndex: 0,
-  timeOfDay: 'sunset',
+  timeOfDay: loadTimeOfDay(),
   hud: initialHud(),
   restartTick: 0,
   respawnTick: 0,
@@ -117,7 +137,12 @@ export const useDriveStore = create<DriveState>()((set) => ({
         : { paused: !s.paused, pauseView: 'main' },
     ),
   cycleCamera: () => set((s) => ({ cameraIndex: (s.cameraIndex + 1) % DRIVE_CAMERAS.length })),
-  toggleTimeOfDay: () => set((s) => ({ timeOfDay: s.timeOfDay === 'sunset' ? 'night' : 'sunset' })),
+  toggleTimeOfDay: () =>
+    set((s) => {
+      const timeOfDay = s.timeOfDay === 'sunset' ? 'night' : 'sunset';
+      saveTimeOfDay(timeOfDay);
+      return { timeOfDay };
+    }),
   restart: () => set((s) => ({ restartTick: s.restartTick + 1, hud: initialHud() })),
   respawn: () => set((s) => ({ respawnTick: s.respawnTick + 1 })),
   begin: () => set({ paused: false, pauseView: 'main', ready: false, hud: initialHud() }),
