@@ -2,6 +2,21 @@
 
 ## Durum: Fazlar 0–11 ve V2-1/V2-2 tamam; V2-3 büyük ölçüde tamam — bkz. `docs/PLAN_V2.md`, `docs/ANALYSIS.md`
 
+## V2-3 kalanları + V2-4 mobil (kısmen) — 2026-11-02
+
+**Tamam, testli (431 test, lint ve derleme yeşil)**
+
+- **ABS** (`assists.ts`): gövde kayma açısı ≈7°'yi aşınca fren kısılır (en fazla %45'e kadar), düz frenlemede ve el freninde dokunmaz. Ayrı bir boyuna kayma ölçümü olmadığı için yanal kaymaya göre çalışır.
+- **Yardımcı ayarları** (`assistStore.ts`, kalıcı): direksiyon yardımı, çekiş kontrolü, ABS; Ayarlar penceresinde ve duraklat menüsünde ("Ayarlar"). Varsayılan: TC kapalı, diğerleri açık.
+- **HUD:** gaz/fren çubukları, ABS/TC/HB lambaları, drift açısı, tur süresinin yanında en iyi tura fark (100 dilimli geçiş tablosu, `lap.ts`).
+- **Mobil altyapı:** `core/platform/device.ts` (`useLayout`), dokunmatikte ilk açılış kalitesi düşük ve dpr ≤ 1,5, `viewport-fit=cover`, safe-area, `100dvh`, tuvalde `touch-action: none`.
+- **Dokunmatik sürüş:** solda analog direksiyon bölgesi, sağda gaz/fren/el freni/nitro, üstte duraklat/kamera/geri koy; klavye + gamepad + dokunmatik "büyük olan kazanır" ile birleşir. Dikeyde "cihazı çevirin" katmanı, Wake Lock, arka plana geçince duraklat.
+
+**Yazıldı ama tarayıcıda doğrulanmadı** (Chrome bağlantısı koptu; pencere yeniden boyutlandırma görünümü değiştirmedi)
+
+- Dar ekran atölye düzeni (yan şerit/alt çekmece), mobil HUD yerleşimi, dokunmatik kontrollerin gerçek dokunmayla davranışı. İlk kontrol: 390×844, 844×390, 360×800, 1024×768.
+- Yapılmadı: gyro direksiyon, `autoQuality` eşiklerinin mobil için sıkılaştırılması, vinil gizmo tutamaçlarının büyütülmesi, `handling.test.ts`'e ABS'li fren mesafesi testi.
+
 ## Üçüncü araç + HUD ✅ (2026-10-20)
 
 - **2001 BMW M3 GTR** (Sketchfab, tonielpro520, **CC-BY-4.0**; kredi ekranında): GLB 18,9 → 3,6 MB (meshopt + WebP, doku ≤ 2048 px). Lastik/jantlar `hideMaterials` ile gizlenir, oyunun tekerlekleri takılır (konumlar lastik adalarından ölçüldü: ön ±0,755 / z 1,475, arka ±0,745 / z −1,26, r 0,315). Boya bölgeleri yüzey adalarıyla: kapı, kaput, bagaj, ayna, tampon + tavan (bölge kutusu) + gövde. Slotlar: kaput ve marşpiyel (GTR'nin kanadı/splitter'ı ve kafesi modelde kaynaşık; overlay çakışırdı). Yarı slik 18", 1250 kg, daha yüksek tutuş (`driving.json`). Testli (`bmw.test.ts`); sürüş testleri üç araçta.

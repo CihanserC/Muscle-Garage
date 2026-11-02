@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { currentLayout } from '../platform/device';
 import qualityJson from '../../data/graphics/quality.json';
 
 export const QUALITY_LEVELS = ['low', 'medium', 'high', 'ultra'] as const;
@@ -28,6 +29,13 @@ export type QualityPreset = {
 export const qualityPresets = qualityJson as Record<QualityLevel, QualityPreset>;
 
 export const DEFAULT_QUALITY: QualityLevel = 'high';
+/** Dokunmatik cihazlarda (telefon/tablet GPU'su) ilk açılış kalitesi */
+export const DEFAULT_TOUCH_QUALITY: QualityLevel = 'low';
+/** Dokunmatik cihazlarda cihaz piksel oranı üst sınırı */
+export const TOUCH_MAX_DPR = 1.5;
+
+const defaultQuality = (): QualityLevel =>
+  currentLayout().isTouch ? DEFAULT_TOUCH_QUALITY : DEFAULT_QUALITY;
 /**
  * §17 kararı (2026-10-17, karşılaştırma: docs/tonemapping/): varsayılan ACES (daha doygun,
  * dramatik Most Wanted havası); oyuncu üst çubuktan AgX'e geçebilir.
@@ -65,7 +73,7 @@ export function sanitizeGraphics(
 ): Pick<GraphicsState, 'quality' | 'toneMapping' | 'showFps' | 'autoQuality'> {
   const src = (typeof input === 'object' && input !== null ? input : {}) as Record<string, unknown>;
   return {
-    quality: oneOf(QUALITY_LEVELS, src.quality, DEFAULT_QUALITY),
+    quality: oneOf(QUALITY_LEVELS, src.quality, defaultQuality()),
     toneMapping: oneOf(TONE_MAPPINGS, src.toneMapping, DEFAULT_TONE_MAPPING),
     showFps: typeof src.showFps === 'boolean' ? src.showFps : true,
     autoQuality: typeof src.autoQuality === 'boolean' ? src.autoQuality : true,

@@ -197,8 +197,8 @@ Her faz: uygula → test/lint/build → tarayıcıda doğrula → `PROGRESS.md` 
 
 ### V2-3 — Sürüş göstergeleri ve sürüş mekaniği
 
-- [~] HUD yenileme: devir saati (SVG kadran, kırmızı bölge, ibre), dijital hız + vites, vites ışığı, kontroller Esc menüsünde ✅; pedallar, kayma/boost, ara zaman farkı açık
-- [~] Yardımcı sistemler: çekiş kontrolü + ters direksiyon yardımı (`assists.ts`, testli) ✅; ABS ve ayarlar arayüzü açık
+- [x] HUD yenileme: devir saati, dijital hız + vites, vites ışığı, gaz/fren çubukları, ABS/TC/el freni lambaları, drift açısı, en iyi tura fark (2026-11-02)
+- [x] Yardımcı sistemler: çekiş kontrolü + ters direksiyon yardımı + ABS (`assists.ts`, testli), Ayarlar penceresinde kalıcı aç/kapa (`assistStore.ts`), duraklat menüsünden erişim (2026-11-02)
 - [x] Tutuş eğrisi (yanal lastik modeli), çarpışma yumuşatma (kesintisiz bariyer zinciri, kapsül çarpışma), direksiyon modeli (tepe kayma açısıyla sınırlı açı; 100 km/s yarıçap 97 → 62 m), kamera (araca kilitli, hafif geri çekilme); anti-roll gereksiz (gövde yatışı <1°)
 - [x] Araca özel `driving.json` (Vanta, Mustang): tutuş, arka kayma, gevşeme, yatış, fren dağılımı, el freni
 - [x] Başsız test paketi: skidpad, slalom, 100→0, 0–100, drift, devrilme (`handling.test.ts`, her iki araç); otopilot turu `lap.test.ts`'te (yalnız Vanta)
@@ -214,10 +214,10 @@ Her faz: uygula → test/lint/build → tarayıcıda doğrula → `PROGRESS.md` 
 
 ### V2-4 — Mobil uyumluluk
 
-- [ ] Cihaz algılama, mobil kalite varsayılanları, viewport/safe-area/dokunma ayarları
-- [ ] Atölye düzeni (alt çekmece), büyük dokunma hedefleri, editörlerin mobil düzeltmeleri
-- [ ] Dokunmatik sürüş kontrolleri (+ isteğe bağlı gyro), mobil HUD yerleşimi
-- [ ] Dikey uyarısı, Wake Lock, ses açma
+- [x] Cihaz algılama (`core/platform/device.ts`), mobil kalite varsayılanı (low) + dpr ≤ 1,5, viewport/safe-area/dokunma ayarları
+- [~] Atölye düzeni: dar ekranda yan şerit (yatay) / alt çekmece (dikey), ≥44 px hedefler (CSS yazıldı, tarayıcıda DOĞRULANMADI)
+- [~] Dokunmatik sürüş kontrolleri (`TouchControls.tsx`, `touchInput.ts`, `core/input/touch.ts` testli) ve kompakt mobil HUD yazıldı, tarayıcıda DOĞRULANMADI; gyro yapılmadı
+- [x] Dikey uyarısı, Wake Lock, arka planda otomatik duraklat (ses ilk dokunuşla açılma mevcut `pointerdown` yolunda)
 - [ ] Çoklu boyutta tarayıcı doğrulaması (390×844, 844×390, 360×800, 1024×768)
 
 ### V2-5 — Vanta iç mekân v2 + kokpit kamerası

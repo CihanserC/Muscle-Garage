@@ -14,7 +14,8 @@ import { DriveOverlay } from '../drive/ui/DriveOverlay';
 import { DEFAULT_CAR_ID, getCar } from '../data/cars';
 import { sceneConfig } from '../garage/scene/sceneConfig';
 import { useAppStore } from '../core/store/appStore';
-import { useQualityPreset } from '../core/store/graphicsStore';
+import { useLayout } from '../core/platform/device';
+import { TOUCH_MAX_DPR, useQualityPreset } from '../core/store/graphicsStore';
 import { usePhotoStore } from '../core/store/photoStore';
 import { takePhoto } from '../garage/photo/actions';
 import { categoryKind } from '../garage/ui/categories';
@@ -74,6 +75,7 @@ function useGamepad() {
 export function App() {
   useGamepad();
   const q = useQualityPreset();
+  const layout = useLayout();
   const mode = useAppStore((s) => s.mode);
   const photoMode = useAppStore((s) => categoryKind(s.categoryId) === 'photo');
   const hideUi = usePhotoStore((s) => s.hideUi);
@@ -90,7 +92,7 @@ export function App() {
         // Gölge türü değişince renderer yeniden kurulsun.
         key={q.shadows ? 'shadows' : 'no-shadows'}
         shadows={q.shadows ? 'soft' : false}
-        dpr={[1, q.dpr]}
+        dpr={[1, layout.isTouch ? Math.min(q.dpr, TOUCH_MAX_DPR) : q.dpr]}
         // Ton eşleme post-processing'de yapılır (AgX/ACES seçimi).
         flat
         gl={{ antialias: false, powerPreference: 'high-performance' }}

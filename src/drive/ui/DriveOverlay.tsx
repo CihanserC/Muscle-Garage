@@ -17,7 +17,9 @@ import { playUiSound } from '../../audio/uiSound';
 import { volumeLabel } from '../../audio/volumeLabel';
 import { DRIVE_CAMERAS, useDriveStore } from '../../core/store/driveStore';
 import { useGraphicsStore } from '../../core/store/graphicsStore';
+import { useLayout } from '../../core/platform/device';
 import { t } from '../../i18n';
+import { TouchControls } from './TouchControls';
 import './drive.css';
 
 const MINIMAP = { size: 168, pad: 14, step: 4 };
@@ -455,14 +457,51 @@ function useDriveKeys() {
   }, []);
 }
 
+/**
+ * Sürüş boyunca ekranı uyanık tutar (Wake Lock, destekleyen tarayıcıda) ve sekme/uygulama arka
+ * plana geçince oyunu duraklatır.
+ */
+function useDriveLifecycle() {
+  useEffect(() => {
+    let lock: WakeLockSentinel | null = null;
+    const acquire = () => {
+      if (document.visibilityState !== 'visible') return;
+      navigator.wakeLock
+        ?.request('screen')
+        .then((l) => {
+          lock = l;
+        })
+        .catch(() => {
+          // İzin verilmedi / pil tasarrufu: ekran kararabilir, oyun etkilenmez
+        });
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === 'hidden') {
+        const s = useDriveStore.getState();
+        if (!s.paused) s.setPaused(true);
+      } else acquire();
+    };
+    acquire();
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
+      void lock?.release().catch(() => undefined);
+    };
+  }, []);
+}
+
 /** Test sürüşü arayüzü: HUD, minimap, yükleme ve duraklatma menüsü. */
 export function DriveOverlay() {
   useDriveKeys();
+  useDriveLifecycle();
   const ready = useDriveStore((s) => s.ready);
   const paused = useDriveStore((s) => s.paused);
+  const { isTouch, isPortrait } = useLayout();
   return (
     <div className="dv-root">
       {ready ? <Hud /> : <div className="dv-loading">{t('drive.loading')}</div>}
+      {ready && isTouch && !paused && !isPortrait && <TouchControls />}
+      {isTouch && isPortrait && <div className="dv-rotate">{t('touch.rotate')}</div>}
       {paused && <PauseMenu />}
     </div>
   );

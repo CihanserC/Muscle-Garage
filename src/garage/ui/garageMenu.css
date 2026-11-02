@@ -304,3 +304,80 @@
 .gm-fps-readout.is-low {
   color: #ff9a3c;
 }
+
+/* Mobil / dar ekran: panel yan şerit (yatay) ya da alt çekmece (dikey) olur; 3B sahne görünür kalır. */
+@media (max-width: 820px), (max-height: 500px) {
+  .gm-panel,
+  .gm-panel.is-wide {
+    left: calc(8px + var(--safe-left, 0px));
+    top: 52px;
+    bottom: calc(8px + var(--safe-bottom, 0px));
+    width: min(340px, 46vw);
+    max-height: none;
+  }
+
+  .gm-panel.is-wide {
+    width: min(390px, 54vw);
+  }
+
+  .gm-topbar {
+    top: calc(8px + var(--safe-top, 0px));
+    right: calc(8px + var(--safe-right, 0px));
+    gap: 6px;
+  }
+
+  .gm-chip {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .gm-hints {
+    display: none;
+  }
+
+  .pf-stats-panel {
+    top: 52px;
+    right: calc(8px + var(--safe-right, 0px));
+    width: min(250px, 40vw);
+  }
+}
+
+@media (orientation: portrait) and (max-width: 820px) {
+  .gm-panel,
+  .gm-panel.is-wide {
+    left: 0;
+    right: 0;
+    top: auto;
+    bottom: 0;
+    width: auto;
+    max-height: 52dvh;
+    padding-bottom: var(--safe-bottom, 0px);
+    border-left: none;
+    border-top: 3px solid var(--gm-accent);
+    clip-path: none;
+  }
+
+  .gm-panel.is-wide {
+    max-height: 58dvh;
+  }
+
+  .pf-stats-panel {
+    display: none;
+  }
+}
+
+/* Parmakla kullanım: ≥44 px dokunma hedefleri */
+@media (pointer: coarse) {
+  .gm-item,
+  .gm-chip {
+    min-height: 44px;
+  }
+
+  .gm-icon {
+    min-width: 44px;
+  }
+
+  input[type='range'] {
+    min-height: 32px;
+  }
+}
