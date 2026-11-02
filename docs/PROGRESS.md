@@ -2,6 +2,23 @@
 
 ## Durum: Fazlar 0–11, V2-1…V2-3 ve V2-5 tamam; V2-4 kodu tamam (tarayıcıda doğrulanmadı); V2-6 kısmen — bkz. `docs/PLAN_V2.md`, `docs/ANALYSIS.md`
 
+## Geliştirme fikirleri turu (PLAN_V2 §8) — 2026-11-02
+
+**Yapıldı** (487 test; lint, tür kontrolü, derleme yeşil)
+
+- **Motor sesi sentezi iyileştirildi** (#2, yalnız sentez; ses dinlenemedi): oyun içi sesler artık V8'e özgü harmonik dalga (`v8Harmonics`), rölantide düzensiz ateşleme "lope"u (`lopeDepth`) ve gaz kapamada rastgele egzoz patlamaları (`popChance`) içerir. Testsiz kısım: gerçek duyuş; beğenilmezse sabitler `EngineAudio.ts` başında.
+- **Gamepad titreşimi** (#4 kısmen): kayma, nitro ve ani hız kaybı (çarpma) `Gamepad.vibrationActuator` ile titreşim verir (`core/input/rumble.ts`, testli). Gerçek gamepad ile denenmedi.
+- **HUD boyutu** (#10): Ayarlar'da %85 / 100 / 120 / 140; mobil düzende de çarpan olarak uygulanır.
+- **Paylaşım kodu** (#9): build, "MG1:" önekli kısa metin koduna sıkıştırılır (deflate + base64url); garajda "Paylaşım kodunu kopyala", içe aktarma kutusu hem JSON'u hem kodu kabul eder (`shareCode.ts`, testli).
+- **Altyapı** (#11 kısmen): GitHub Actions artık `npm test`'i de çalıştırır; Prettier `endOfLine: auto` (CRLF uyarıları biter).
+- **Model bütçesi testi** (#3 kısmen): Mustang 67,6 bin üçgen / 141 mesh / 13 materyal; **BMW 190 bin üçgen** / 40 mesh / 27 materyal (en ağır; mobil için sadeleştirme adayı). Test 200 bin tavanıyla gerilemeyi korur.
+
+**Yapılmadı / yapılamadı**
+
+- #1 görsel doğrulama ve #14 gerçek cihaz testi: tarayıcı/cihaz erişimi yok.
+- #3 FPS ölçümü, #12 paket boyutu/PWA (simge dosyaları yok, service worker yazılmadı).
+- #5 kariyer/ekonomi, #6 yeni pist + hava, #7 rakipler/çevrimiçi, #8 hasar modeli, #13 Mustang/BMW iç mekân: büyük ve tasarım kararı gerektiriyor; başlanmadı.
+
 ## Kullanıcı geri bildirimi turu 3 — 2026-11-02
 
 **Yapıldı** (484 → 477 test: ses katmanı testleri geri alma ile gitti; lint, tür kontrolü, derleme yeşil)

@@ -52,6 +52,12 @@ Kabul ölçütleri (`npm run lint`, `npm test`, `npm run build`): hepsi yeşil �
 - Kayıtlı motor sesi denendi, beğenilmedi, geri alındı (sentez ses duruyor). Açık risk: motor sesi kalitesi.
 - Testler: 477 / 54 dosya.
 
+## 1f. Güncelleme (2026-11-02, geliştirme fikirleri turu)
+
+- Sentez motor sesi V8 harmonikleri, lope ve patlamalarla zenginleştirildi; gamepad titreşimi, HUD boyutu ayarı, paylaşım kodu, CI'da test, model bütçesi testi eklendi.
+- **Bulgu:** BMW modeli 190 bin üçgenle Mustang'in (67,6 bin) 2,8 katı; mobil için sadeleştirme (`gltf-transform simplify`) adayı.
+- Testler: 487 / 56 dosya.
+
 ## 2. Mimari
 
 - **Veri odaklı:** araç manifesti, parça kataloğu, boya/jant/duruş/performans/pist verileri JSON; kodda sihirli sayı yok (görsel ayarlar `sceneConfig`, `materialConfig`, fizik sabitleri adlandırılmış sabitlerde).
