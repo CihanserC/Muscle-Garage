@@ -2,6 +2,7 @@ import { useEffect, useRef, type PointerEvent as ReactPointerEvent, type ReactNo
 import { steerFromPointer } from '../../core/input/touch';
 import { useDriveStore } from '../../core/store/driveStore';
 import { t } from '../../i18n';
+import { calibrateGyro, syncGyro } from '../gyroInput';
 import { resetTouch, touchState } from '../touchInput';
 import './touchControls.css';
 
@@ -104,6 +105,11 @@ export function TouchControls() {
   const hasNitro = useDriveStore((s) => s.hud.nitro !== null);
   // Kontroller kaldırılınca (duraklat, çıkış) takılı kalan giriş olmasın
   useEffect(() => resetTouch, []);
+  // Eğim direksiyonu: ayar açıksa dinle, sürüş başında mevcut tutuşu nötr yap
+  useEffect(() => {
+    syncGyro();
+    calibrateGyro();
+  }, []);
   return (
     <div className="tc-root">
       <div className="tc-top">

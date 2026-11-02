@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 import { playUiSound } from '../../audio/uiSound';
 import { useAppStore } from '../../core/store/appStore';
+import { currentLayout } from '../../core/platform/device';
+import { TILT_MODES } from '../../core/input/tilt';
+import { disableGyro, enableGyro } from '../../drive/gyroInput';
 import { useAssistStore } from '../../core/store/assistStore';
+import { useInputStore } from '../../core/store/inputStore';
 import { useAudioStore } from '../../core/store/audioStore';
 import { QUALITY_LEVELS, TONE_MAPPINGS, useGraphicsStore } from '../../core/store/graphicsStore';
 import { LOCALE_NAMES, LOCALES, t, useLocale, useLocaleStore } from '../../i18n';
@@ -28,6 +32,7 @@ function useRows(): Row[] {
   const g = useGraphicsStore();
   const volume = useAudioStore((s) => s.volume);
   const assists = useAssistStore();
+  const tilt = useInputStore((st) => st.tilt);
   const turntable = useAppStore((s) => s.turntable);
   const locale = useLocale();
   const onOff = (v: boolean) => (v ? t('ui.on') : t('ui.off'));
@@ -98,6 +103,21 @@ function useRows(): Row[] {
       value: onOff(assists.abs),
       step: () => assists.setAssist('abs', !assists.abs),
     },
+    // Eğim sensörü yalnız dokunmatik cihazlarda anlamlı
+    ...(currentLayout().isTouch
+      ? [
+          {
+            id: 'tilt',
+            label: t('settings.tilt'),
+            value: t(`tilt.${tilt}`),
+            step: (d: -1 | 1) => {
+              const next = cycle(TILT_MODES, tilt, d);
+              if (next === 'off') disableGyro();
+              else void enableGyro(next);
+            },
+          },
+        ]
+      : []),
     {
       id: 'credits',
       label: t('ui.credits'),

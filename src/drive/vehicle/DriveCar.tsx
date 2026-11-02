@@ -296,8 +296,7 @@ export function DriveCar({
         handbrake: snap.handbrake,
         driftDeg:
           Math.abs(snap.forwardSpeed) > 5
-            ? (Math.atan2(Math.abs(snap.lateralSpeed), Math.abs(snap.forwardSpeed)) * 180) /
-              Math.PI
+            ? (Math.atan2(Math.abs(snap.lateralSpeed), Math.abs(snap.forwardSpeed)) * 180) / Math.PI
             : 0,
         absActive: assistFlags.current.abs,
         tcActive: assistFlags.current.tc,
