@@ -148,12 +148,12 @@ Details: [`docs/PLAN_V2.md`](docs/PLAN_V2.md) · [`docs/ANALYSIS.md`](docs/ANALY
 
 ## 🤝 Contributing
 
-Contributions are welcome! Start with issues labelled [`good first issue`](https://github.com/CihanserC/NFS-Most-Wanted/labels/good%20first%20issue) or [`help wanted`](https://github.com/CihanserC/NFS-Most-Wanted/labels/help%20wanted), and read [`CONTRIBUTING.md`](CONTRIBUTING.md).
+Contributions are welcome! Start with issues labelled [`good first issue`](https://github.com/CihanserC/Muscle-Garage/labels/good%20first%20issue) or [`help wanted`](https://github.com/CihanserC/Muscle-Garage/labels/help%20wanted), and read [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ---
 
 ## 📄 License & credits
 
-Code and procedural assets belong to this project.
+The source code and procedural assets are released under the [MIT License](LICENSE). Third-party assets keep their own licenses, listed below.
 
 The **2013 Ford Mustang GT** model (by Ddiaz Design) is licensed under **CC-BY-NC-SA 4.0**: non-commercial use only, share-alike. The full list of third-party assets is in [`public/assets/CREDITS.json`](public/assets/CREDITS.json) and in the in-game Credits screen. Ford and Mustang are trademarks of their respective owners; this project is not affiliated with them.
