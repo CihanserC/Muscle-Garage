@@ -343,6 +343,8 @@ export const tr: Record<string, string> = {
   'garage.imported': '"{name}" içe aktarıldı (kaydetmek için Kaydet\'e bas).',
   'garage.deleted': 'Kayıt silindi.',
   'garage.error.noPngData': 'Bu görselde gömülü build verisi yok',
+  'garage.copyCode': 'Paylaşım kodunu kopyala',
+  'garage.codeCopied': 'Paylaşım kodu kopyalandı. İçe aktarmak için aşağıdaki kutuya yapıştırın.',
   'garage.copied': 'JSON panoya kopyalandı.',
   'garage.newProject.notice': 'Yeni proje başlatıldı.',
   'garage.error.slot_limit': 'Garaj dolu: en fazla 24 kayıt tutulabilir. Birini sil.',

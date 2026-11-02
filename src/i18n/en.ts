@@ -342,6 +342,8 @@ export const en: Record<string, string> = {
   'garage.imported': '"{name}" imported (press Save to keep it).',
   'garage.deleted': 'Save deleted.',
   'garage.error.noPngData': 'This image has no embedded build data',
+  'garage.copyCode': 'Copy share code',
+  'garage.codeCopied': 'Share code copied. Paste it in the box below to import.',
   'garage.copied': 'JSON copied to clipboard.',
   'garage.newProject.notice': 'New project started.',
   'garage.error.slot_limit': 'Garage full: up to 24 saves can be kept. Delete one first.',

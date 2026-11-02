@@ -1,5 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { extractPngText, PNG_BUILD_KEYWORD } from '../../../core/storage/pngMeta';
+import {
+  decodeShareCode,
+  encodeShareCode,
+  looksLikeShareCode,
+} from '../../../core/storage/shareCode';
 import { useGarageStore } from '../../../core/store/garageStore';
 import { useBuildStore } from '../../../core/store/stores';
 import { exportBuildJson, exportFileName } from '../../../core/storage/garageService';
@@ -116,6 +121,15 @@ function JsonSection() {
       useGarageStore.setState({ notice: { kind: 'error', key: 'garage.error.clipboard' } });
     }
   };
+  const copyCode = async () => {
+    try {
+      const code = await encodeShareCode(exportBuildJson(useBuildStore.getState().build));
+      await navigator.clipboard.writeText(code);
+      useGarageStore.setState({ notice: { kind: 'ok', key: 'garage.codeCopied' } });
+    } catch {
+      useGarageStore.setState({ notice: { kind: 'error', key: 'garage.error.clipboard' } });
+    }
+  };
   const readFile = async (f: File | undefined) => {
     if (!f) return;
     if (f.type === 'image/png' || f.name.toLowerCase().endsWith('.png')) {
@@ -136,6 +150,9 @@ function JsonSection() {
         </button>
         <button type="button" className="ge-btn" onClick={() => void copy()}>
           {t('garage.copyJson')}
+        </button>
+        <button type="button" className="ge-btn" onClick={() => void copyCode()}>
+          {t('garage.copyCode')}
         </button>
         <button type="button" className="ge-btn" onClick={() => file.current?.click()}>
           {t('garage.importFile')}
@@ -160,8 +177,11 @@ function JsonSection() {
         className="ge-btn"
         disabled={text.trim() === ''}
         onClick={() => {
-          importText(text);
+          const input = text;
           setText('');
+          if (!looksLikeShareCode(input)) return importText(input);
+          // Paylaşım kodu: önce açılır, bozuksa JSON hatası gösterilir
+          void decodeShareCode(input).then((json) => importText(json ?? input));
         }}
       >
         {t('garage.importText')}
