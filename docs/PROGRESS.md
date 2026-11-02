@@ -15,7 +15,7 @@
 **Yazıldı ama tarayıcıda doğrulanmadı** (Chrome bağlantısı koptu; pencere yeniden boyutlandırma görünümü değiştirmedi)
 
 - Dar ekran atölye düzeni (yan şerit/alt çekmece), mobil HUD yerleşimi, dokunmatik kontrollerin gerçek dokunmayla davranışı. İlk kontrol: 390×844, 844×390, 360×800, 1024×768.
-- Yapılmadı: gyro direksiyon, `autoQuality` eşiklerinin mobil için sıkılaştırılması, vinil gizmo tutamaçlarının büyütülmesi, `handling.test.ts`'e ABS'li fren mesafesi testi.
+- Yapılmadı: gyro direksiyon, `autoQuality` eşiklerinin mobil için sıkılaştırılması, vinil gizmo tutamaçlarının büyütülmesi.
 
 ## Üçüncü araç + HUD ✅ (2026-10-20)
 

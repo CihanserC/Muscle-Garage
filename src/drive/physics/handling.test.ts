@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { getCar, listCars } from '../../data/cars';
 import { createDefaultBuild } from '../../core/build/build';
+import { applyAssists } from '../../core/drive/assists';
 import type { DriveInput } from '../../core/drive/drivetrain';
 import { buildTrack, getDefaultTrack, queryTrack } from '../../core/drive/track';
 import { startGantry } from '../../core/drive/scenery';
@@ -147,6 +148,47 @@ describe.each(listCars().map((c) => c.manifest.id))('sürüş testleri: %s', (id
     step(v, 3, input({ steer: 1 }));
     expect(v.snapshot().upY).toBeGreaterThan(0.6);
     v.dispose();
+  });
+
+  it('ABS: virajda frenlemede fren mesafesini uzatmaz, devrilmez', () => {
+    // Direksiyon kırıkken tam fren: ABS kayarken freni kısar (assists.ts)
+    const brakeInTurn = (abs: boolean) => {
+      const v = launch(id, 100 / 3.6);
+      const start = v.snapshot().position;
+      const assists = { tractionControl: false, steeringAssist: false, abs };
+      let t = 0;
+      for (; t < 8; t += PHYSICS_STEP) {
+        const s = v.snapshot();
+        const raw = input({ brake: 1, steer: 0.6 });
+        v.step(PHYSICS_STEP, applyAssists(raw, s, assists));
+        if (v.snapshot().speed < 1) break;
+      }
+      const end = v.snapshot();
+      const dist = Math.hypot(end.position[0] - start[0], end.position[2] - start[2]);
+      const out = { dist, time: t, upY: end.upY };
+      v.dispose();
+      return out;
+    };
+    const off = brakeInTurn(false);
+    const on = brakeInTurn(true);
+    expect(on.upY).toBeGreaterThan(0.85);
+    expect(on.dist).toBeLessThanOrEqual(off.dist * 1.05);
+  });
+
+  it('ABS: düz frenlemeyi değiştirmez', () => {
+    const stop = (abs: boolean) => {
+      const v = launch(id, 100 / 3.6);
+      const start = v.snapshot().position;
+      const assists = { tractionControl: false, steeringAssist: false, abs };
+      for (let t = 0; t < 8; t += PHYSICS_STEP) {
+        v.step(PHYSICS_STEP, applyAssists(input({ brake: 1 }), v.snapshot(), assists));
+        if (v.snapshot().speed < 1) break;
+      }
+      const end = v.snapshot().position;
+      v.dispose();
+      return Math.hypot(end[0] - start[0], end[2] - start[2]);
+    };
+    expect(stop(true)).toBeCloseTo(stop(false), 0);
   });
 });
 
