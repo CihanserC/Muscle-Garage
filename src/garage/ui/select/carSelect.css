@@ -213,6 +213,9 @@
   }
   .cs-panel {
     padding: 10px 12px 12px;
+    /* Küçük ekranda panel taşmasın: sığmazsa kendi içinde kayar */
+    max-height: calc(var(--uh, 100dvh) - 90px);
+    overflow-y: auto;
   }
   .cs-hint {
     display: none;
