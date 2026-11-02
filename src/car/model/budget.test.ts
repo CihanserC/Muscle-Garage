@@ -2,7 +2,7 @@ import { appendFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import type { Mesh } from 'three';
 import { prepareModel } from '../../core/model/prepareModel';
-import { getCar, listCars } from '../../data/cars';
+import { listCars } from '../../data/cars';
 import { loadGlbScene, sharedTestMaterials } from './glbTestUtils';
 
 /**
