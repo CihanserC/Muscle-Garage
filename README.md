@@ -3,7 +3,9 @@
 # 🏁 Muscle Garage
 
 **A browser-based 3D car customization garage and test-drive game.**
-Pick a car, tune every part, then take it out on the track.
+Pick a car, tune every part, then take it out on the track, on desktop or phone.
+
+**[▶ Play online](https://cihanserc.github.io/Muscle-Garage/)**
 
 ![React](https://img.shields.io/badge/React-19-61dafb?logo=react&logoColor=white)
 ![Three.js](https://img.shields.io/badge/Three.js-r186-000000?logo=threedotjs&logoColor=white)
@@ -11,10 +13,11 @@ Pick a car, tune every part, then take it out on the track.
 ![Rapier](https://img.shields.io/badge/Physics-Rapier-e8590c)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-8-646cff?logo=vite&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-334%20passing-2ea44f)
-![Phases](https://img.shields.io/badge/phases-0--11%20%2B%20V2--2-orange)
+![Tests](https://img.shields.io/badge/tests-494%20passing-2ea44f)
+![License](https://img.shields.io/badge/license-MIT-blue)
+![Mobile](https://img.shields.io/badge/mobile-touch%20%2B%20tilt-orange)
 
-[Features](#-features) · [Getting started](#-getting-started) · [Controls](#-controls) · [Architecture](#-architecture) · [Roadmap](#-roadmap) · [Credits](#-license--credits)
+[Features](#-features) · [Getting started](#-getting-started) · [Controls](#-controls) · [Architecture](#-architecture) · [Roadmap](#-roadmap) · [Contributing](#-contributing) · [Credits](#-license--credits)
 
 </div>
 
@@ -32,7 +35,7 @@ Pick a car, tune every part, then take it out on the track.
 
 | | |
 |---|---|
-| **Two cars** | **Vanta Stallion '70**, an original procedural classic muscle car, and a **2013 Ford Mustang GT** built from a ready-made GLB model |
+| **Three cars** | **Vanta Stallion '70** (original procedural muscle car with a detailed cabin), a **2013 Ford Mustang GT** and a **2001 BMW M3 GTR**, both from ready-made GLB models |
 | **Body parts** | Hood, bumpers, spoiler, side skirts and more, with live previews |
 | **Paint** | Per-zone colors with metallic, matte and pearl finishes |
 | **Wheels & brakes** | Rim, tire and brake options with a fitment checker (clearance, offset, arch) |
@@ -41,14 +44,22 @@ Pick a car, tune every part, then take it out on the track.
 | **Lighting & glass** | Headlight and taillight styles, window tint |
 | **Performance** | Engine, suspension and drivetrain parts that change how the car drives |
 | **Garage saves** | Save slots, per-car autosave, undo / redo (IndexedDB) |
+| **Sharing** | Export / import builds as JSON, a short `MG1:` share code, or a PNG photo with the build embedded |
 | **Photo mode** | Free camera, adjustable FOV, effects and image export |
 
 ### 🏎️ Test drive
 
 - Rapier-based vehicle physics with a derived spec from your build (mass, grip, power, gearing)
-- Lap timer, best lap, minimap and engine / tire audio
-- Keyboard and gamepad support
+- Drift on handbrake, plus optional steering assist, traction control and ABS
+- Lap timer, split deltas against your best lap, a ghost car of your best lap (toggleable), minimap and engine / tire audio
+- Day / night with working headlights and taillights; chase, hood and cockpit cameras
+- Keyboard, gamepad (with rumble) and **touch** controls; optional tilt steering on phones
 - Adaptive graphics quality (Low / Medium / High) that steps down automatically when FPS drops
+- Settings for language (EN / TR), HUD size, control scheme, assists and more
+
+### 📱 Mobile
+
+The UI scales to phone screens, the garage panel collapses, and the drive screen shows on-screen steering, gas, brake / drift, handbrake and nitro buttons. Auto quality starts lower on touch devices. Settings → Controls can force the touch layout if it is not detected.
 
 ---
 
@@ -78,8 +89,9 @@ npm run dev        # http://localhost:5173
 |---|---|---|
 | Throttle / Brake | `W` / `S` | `RT` / `LT` |
 | Steer | `A` / `D` | Left stick |
-| Handbrake | `Space` | `A` or `X` |
-| Change camera | `C` | `Y` |
+| Handbrake / drift | `Space` | `A` or `X` |
+| Nitro | `Shift` | `RB` |
+| Change camera (chase / hood / cockpit) | `C` | `Y` |
 | Reset onto track | `R` | `B` |
 | Pause | `Esc` | `Start` |
 | Mute / volume | `M` | |
@@ -137,10 +149,11 @@ Cars are **data-driven**: a manifest describes slots, wheel positions, paint zon
 | 0 – 11 | Garage, parts, paint, wheels, vinyl, stance, photo mode, drive mode, polish | ✅ Done |
 | V2-1 | Multi-car architecture, car select screen, settings dialog | ✅ Done |
 | V2-2 | 2013 Ford Mustang GT as the second car | ✅ Done |
-| V2-3 | New HUD and driving mechanics (tire model, ABS / TC, assists) | 🚧 In progress |
-| V2-4 | Mobile support (touch controls, bottom-sheet layout) | ⏳ Planned |
-| V2-5 | Detailed Vanta interior and cockpit camera | ⏳ Planned |
-| V2-6 | Polish, performance pass, final report | ⏳ Planned |
+| V2-3 | HUD and driving mechanics (drift, ABS / TC, assists, split deltas) | ✅ Done |
+| V2-4 | Mobile support (touch controls, scaled UI, tilt steering) | ✅ Done, needs more real-device testing |
+| V2-5 | Detailed Vanta interior and cockpit camera | ✅ Done (Mustang / BMW interiors open) |
+| V2-6 | Polish, performance pass, final report | 🚧 Ongoing |
+| Next | Career / economy, more tracks and weather, rivals, damage model, PWA | 💡 Ideas, see [open issues](https://github.com/CihanserC/Muscle-Garage/issues) |
 
 Details: [`docs/PLAN_V2.md`](docs/PLAN_V2.md) · [`docs/ANALYSIS.md`](docs/ANALYSIS.md) · [`docs/PROGRESS.md`](docs/PROGRESS.md)
 
