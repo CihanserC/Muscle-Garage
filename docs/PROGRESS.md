@@ -2,6 +2,16 @@
 
 ## Durum: Fazlar 0–11, V2-1…V2-3 ve V2-5 tamam; V2-4 kodu tamam (tarayıcıda doğrulanmadı); V2-6 kısmen — bkz. `docs/PLAN_V2.md`, `docs/ANALYSIS.md`
 
+## Telefon testi geri bildirimi — 2026-11-02
+
+Gerçek telefonda test edildi: butonlar ekranı kaplıyor, araç ekrana göre büyük, test sürüşünde dokunmatik butonlar yok, arayüz çok iri. (Telefondaki düzeltmeler gözle doğrulanmadı; ilk gerçek cihaz geri bildirimi bu turu tetikledi.)
+
+- **Arayüz ölçek katmanı** (`UiLayer.tsx`, `uiScaleFor`): kısa kenar 640 px altındaysa tüm arayüz (atölye, seçim, HUD, ayarlar, kredi) orantılı küçültülür (en az 0,62); katmanın ölçek öncesi boyutu `--uw`/`--uh` ile CSS'e verilir (vw/dvh yerine). Masaüstünde ölçek 1.
+- **Kadraj uyumu** (`FitView`, `fitFov`): dar/dikey ekranda atölye ve seçim kamerasının görüş açısı artar (araç sığar); yatay telefonda görüntü sağa kayar (sol panel payı). Fotoğraf modunda kullanıcı FOV'u geçerli.
+- **Dokunmatik algısı sağlamlaştı:** `pointer: coarse` demeyen ama `hover: none` olan ve dokunma noktası bulunan cihazlar da dokunmatik sayılır (telefonda ekran kontrolleri çıkmamasının olası nedeni). Çıkmazsa Ayarlar → Kontroller → Dokunmatik ekran.
+- **Dokunmatik kontroller büyütüldü** (katman ölçeğini telafi: gaz 116×150, fren 98×112, direksiyon bölgesi 120 px yüksek, üst düğmeler 58 px); mobil HUD'daki ek küçültmeler azaltıldı.
+- **Atölye paneli katlanır** (▾/▴, yalnız dar ekranda): sahne ve araç görünür kalır.
+
 ## Geliştirme fikirleri turu (PLAN_V2 §8) — 2026-11-02
 
 **Yapıldı** (487 test; lint, tür kontrolü, derleme yeşil)

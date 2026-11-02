@@ -55,6 +55,8 @@ const formatPrice = (price: number) => (price === 0 ? '—' : `$${formatNumber(p
 
 /** Most Wanted tarzı atölye menüsü. */
 export function GarageMenu() {
+  // Telefonda panel katlanabilir (sahne görünsün)
+  const [collapsed, setCollapsed] = useState(false);
   const app = useAppStore();
   const { categoryId, slotId, paintZone, selectCategory, selectSlot, selectPaintZone } = app;
   const carId = useBuildStore((s) => s.build.carId);
@@ -268,7 +270,9 @@ export function GarageMenu() {
 
   return (
     <div className="gm-root">
-      <div className={`gm-panel${EDITOR_LEVELS.includes(level) ? ' is-wide' : ''}`}>
+      <div
+        className={`gm-panel${EDITOR_LEVELS.includes(level) ? ' is-wide' : ''}${collapsed ? ' is-collapsed' : ''}`}
+      >
         <div className="gm-header">
           {level !== 'categories' && (
             <button type="button" className="gm-back" onClick={back} aria-label={t('ui.back')}>
@@ -283,6 +287,15 @@ export function GarageMenu() {
               {title}
             </div>
           </div>
+          <button
+            type="button"
+            className="gm-collapse"
+            onClick={() => setCollapsed((c) => !c)}
+            aria-label={collapsed ? t('ui.expand') : t('ui.collapse')}
+            aria-expanded={!collapsed}
+          >
+            {collapsed ? '▴' : '▾'}
+          </button>
         </div>
         {level === 'garage' ? (
           <GarageEditor />

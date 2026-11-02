@@ -9,8 +9,8 @@
 }
 
 .st-panel {
-  width: min(520px, calc(100vw - 24px));
-  max-height: calc(100dvh - 32px);
+  width: min(520px, calc(var(--uw, 100vw) - 24px));
+  max-height: calc(var(--uh, 100dvh) - 32px);
   display: flex;
   flex-direction: column;
   color: #f2efe8;

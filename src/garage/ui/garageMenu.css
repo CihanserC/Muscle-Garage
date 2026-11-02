@@ -312,12 +312,12 @@
     left: calc(8px + var(--safe-left, 0px));
     top: 52px;
     bottom: calc(8px + var(--safe-bottom, 0px));
-    width: min(340px, 46vw);
+    width: min(340px, calc(var(--uw, 100vw) * 0.46));
     max-height: none;
   }
 
   .gm-panel.is-wide {
-    width: min(390px, 54vw);
+    width: min(390px, calc(var(--uw, 100vw) * 0.54));
   }
 
   .gm-topbar {
@@ -338,7 +338,7 @@
   .pf-stats-panel {
     top: 52px;
     right: calc(8px + var(--safe-right, 0px));
-    width: min(250px, 40vw);
+    width: min(250px, calc(var(--uw, 100vw) * 0.4));
   }
 }
 
@@ -350,7 +350,7 @@
     top: auto;
     bottom: 0;
     width: auto;
-    max-height: 52dvh;
+    max-height: calc(var(--uh, 100dvh) * 0.52);
     padding-bottom: var(--safe-bottom, 0px);
     border-left: none;
     border-top: 3px solid var(--gm-accent);
@@ -358,7 +358,7 @@
   }
 
   .gm-panel.is-wide {
-    max-height: 58dvh;
+    max-height: calc(var(--uh, 100dvh) * 0.58);
   }
 
   .pf-stats-panel {
@@ -379,5 +379,32 @@
 
   input[type='range'] {
     min-height: 32px;
+  }
+}
+
+/* Telefon: panel katlanır, sahne ve araç görünür kalır */
+.gm-collapse {
+  display: none;
+  margin-left: auto;
+  min-width: 40px;
+  min-height: 40px;
+  font-size: 18px;
+  color: var(--gm-text);
+  background: transparent;
+  border: 1px solid var(--gm-line);
+}
+
+@media (max-width: 820px), (max-height: 500px) {
+  .gm-collapse {
+    display: block;
+  }
+
+  .gm-panel.is-collapsed {
+    bottom: auto;
+    max-height: none;
+  }
+
+  .gm-panel.is-collapsed > :not(.gm-header) {
+    display: none;
   }
 }

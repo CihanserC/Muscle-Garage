@@ -58,6 +58,10 @@ Kabul ölçütleri (`npm run lint`, `npm test`, `npm run build`): hepsi yeşil �
 - **Bulgu:** BMW modeli 190 bin üçgenle Mustang'in (67,6 bin) 2,8 katı; mobil için sadeleştirme (`gltf-transform simplify`) adayı.
 - Testler: 487 / 56 dosya.
 
+## 1g. Güncelleme (2026-11-02, telefon testi)
+
+- İlk gerçek telefon testinde arayüzün masaüstü ölçüsünde olduğu görüldü: ölçek katmanı, kadraj uyumu, daha sağlam dokunmatik algısı, katlanır atölye paneli ve büyütülmüş dokunmatik kontroller eklendi. **Henüz telefonda yeniden doğrulanmadı.** Testler: 492.
+
 ## 2. Mimari
 
 - **Veri odaklı:** araç manifesti, parça kataloğu, boya/jant/duruş/performans/pist verileri JSON; kodda sihirli sayı yok (görsel ayarlar `sceneConfig`, `materialConfig`, fizik sabitleri adlandırılmış sabitlerde).

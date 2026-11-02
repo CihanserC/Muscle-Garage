@@ -23,9 +23,9 @@
 }
 
 .tc-small {
-  width: 44px;
-  height: 44px;
-  font-size: 16px;
+  width: 58px;
+  height: 58px;
+  font-size: 20px;
   color: #f2efe8;
   background: rgba(8, 9, 12, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.22);
@@ -37,8 +37,8 @@
   position: absolute;
   left: calc(14px + var(--safe-left, 0px));
   bottom: calc(14px + var(--safe-bottom, 0px));
-  width: min(300px, 38vw);
-  height: 96px;
+  width: min(340px, calc(var(--uw, 100vw) * 0.38));
+  height: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -64,8 +64,8 @@
 }
 
 .tc-thumb {
-  width: 56px;
-  height: 56px;
+  width: 70px;
+  height: 70px;
   background: rgba(255, 122, 24, 0.75);
   border: 2px solid rgba(255, 255, 255, 0.6);
   border-radius: 50%;
@@ -108,21 +108,21 @@
 }
 
 .tc-btn.is-gas {
-  width: 92px;
-  height: 120px;
+  width: 116px;
+  height: 150px;
   border-color: #39e07a;
 }
 
 .tc-btn.is-brake {
-  width: 78px;
-  height: 90px;
+  width: 98px;
+  height: 112px;
   border-color: #ff4a3a;
 }
 
 .tc-btn.is-hb,
 .tc-btn.is-nitro {
-  width: 64px;
-  height: 52px;
+  width: 80px;
+  height: 64px;
 }
 
 .tc-btn.is-nitro {
@@ -152,29 +152,29 @@
   top: calc(8px + var(--safe-top, 0px));
   left: calc(8px + var(--safe-left, 0px));
   padding: 4px 8px 6px;
-  transform: scale(calc(0.82 * var(--hud-scale, 1)));
+  transform: scale(var(--hud-scale, 1));
   transform-origin: top left;
 }
 
 .dv-root.is-touch .dv-topright {
   top: calc(8px + var(--safe-top, 0px));
   right: calc(8px + var(--safe-right, 0px));
-  transform: scale(calc(0.62 * var(--hud-scale, 1)));
+  transform: scale(calc(0.8 * var(--hud-scale, 1)));
   transform-origin: top right;
 }
 
 .dv-root.is-touch .dv-speedo {
   right: 50%;
   bottom: calc(4px + var(--safe-bottom, 0px));
-  transform: translateX(50%) scale(calc(0.56 * var(--hud-scale, 1)));
+  transform: translateX(50%) scale(calc(0.78 * var(--hud-scale, 1)));
   transform-origin: bottom center;
 }
 
 .dv-root.is-touch .dv-nitro {
   right: auto;
-  left: calc(50% + 72px);
+  left: calc(50% + 100px);
   bottom: calc(10px + var(--safe-bottom, 0px));
-  transform: scale(calc(0.6 * var(--hud-scale, 1)));
+  transform: scale(calc(0.8 * var(--hud-scale, 1)));
   transform-origin: bottom left;
 }
 

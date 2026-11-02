@@ -399,6 +399,8 @@ export const tr: Record<string, string> = {
   'tilt.on': 'Açık',
   'tilt.inverted': 'Açık (ters yön)',
   'settings.controls': 'Kontroller',
+  'ui.expand': 'Paneli aç',
+  'ui.collapse': 'Paneli gizle',
   'settings.hudScale': 'HUD boyutu',
   'settings.lamps': 'Gösterge lambaları (ABS/TC/EF/drift)',
   'settings.ghost': 'En iyi tur hayaleti',

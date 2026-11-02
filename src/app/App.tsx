@@ -1,5 +1,6 @@
 import { Fragment, lazy, Suspense, useEffect } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useStore, useThree } from '@react-three/fiber';
+import type { PerspectiveCamera } from 'three';
 import { GarageScene } from '../garage/scene/GarageScene';
 import { startGamepadBridge } from '../core/input/gamepadBridge';
 import { useDriveStore } from '../core/store/driveStore';
@@ -14,7 +15,8 @@ import { DriveOverlay } from '../drive/ui/DriveOverlay';
 import { DEFAULT_CAR_ID, getCar } from '../data/cars';
 import { sceneConfig } from '../garage/scene/sceneConfig';
 import { useAppStore } from '../core/store/appStore';
-import { useLayout } from '../core/platform/device';
+import { fitFov, useLayout } from '../core/platform/device';
+import { UiLayer } from './UiLayer';
 import { TOUCH_MAX_DPR, useQualityPreset } from '../core/store/graphicsStore';
 import { usePhotoStore } from '../core/store/photoStore';
 import { takePhoto } from '../garage/photo/actions';
@@ -72,6 +74,35 @@ function useGamepad() {
   );
 }
 
+/**
+ * Atölye / araç seçimi kadrajı ekran oranına uyar: dar ve dikey ekranda görüş açısı artar (araç
+ * kadraja sığar); telefonda yatayken sol paneli telafi etmek için görüntü sağa kayar.
+ * Fotoğraf modunda kullanıcının FOV'u geçerlidir.
+ */
+function FitView({ photo }: { photo: boolean }) {
+  const store = useStore();
+  const size = useThree((st) => st.size);
+  const { isCompact, isPortrait } = useLayout();
+  useEffect(() => {
+    const cam = store.getState().camera as PerspectiveCamera;
+    if (photo) {
+      cam.clearViewOffset();
+      cam.updateProjectionMatrix();
+      return;
+    }
+    cam.fov = fitFov(sceneConfig.camera.fov, size.width / size.height);
+    // Yatay telefonda soldaki panel görüntünün ~%22'sini kaplar: araç boş alanın ortasına kayar
+    if (isCompact && !isPortrait)
+      cam.setViewOffset(size.width, size.height, -size.width * 0.2, 0, size.width, size.height);
+    else cam.clearViewOffset();
+    cam.updateProjectionMatrix();
+    return () => {
+      cam.clearViewOffset();
+    };
+  }, [store, size.width, size.height, photo, isCompact, isPortrait]);
+  return null;
+}
+
 export function App() {
   useGamepad();
   const q = useQualityPreset();
@@ -100,31 +131,34 @@ export function App() {
       >
         <BootDismiss />
         <Suspense fallback={null}>{mode === 'drive' ? <DriveScene /> : <GarageScene />}</Suspense>
+        {mode !== 'drive' && <FitView photo={photoMode} />}
       </Canvas>
       <AutoQuality />
       {/* Dil değişince arayüz katmanı yeniden kurulur (önbelleğe alınmış etiketler dahil);
           3B sahne etkilenmez. */}
-      <Fragment key={locale}>
-        {creditsOpen && <CreditsScreen />}
-        {settingsOpen && <SettingsDialog />}
-        {mode === 'garage' && photoMode && <PhotoShortcuts />}
-        {mode === 'garage' && photoMode && hideUi && (
-          <div className="ge-hint">{t('photo.showUi')}</div>
-        )}
-        {mode === 'select' && (
-          <>
-            <CarSelect />
-            <TopBar />
-          </>
-        )}
-        {mode === 'garage' && !(photoMode && hideUi) && (
-          <>
-            <GarageMenu />
-            <TopBar />
-          </>
-        )}
-        {mode === 'drive' && <DriveOverlay />}
-      </Fragment>
+      <UiLayer>
+        <Fragment key={locale}>
+          {creditsOpen && <CreditsScreen />}
+          {settingsOpen && <SettingsDialog />}
+          {mode === 'garage' && photoMode && <PhotoShortcuts />}
+          {mode === 'garage' && photoMode && hideUi && (
+            <div className="ge-hint">{t('photo.showUi')}</div>
+          )}
+          {mode === 'select' && (
+            <>
+              <CarSelect />
+              <TopBar />
+            </>
+          )}
+          {mode === 'garage' && !(photoMode && hideUi) && (
+            <>
+              <GarageMenu />
+              <TopBar />
+            </>
+          )}
+          {mode === 'drive' && <DriveOverlay />}
+        </Fragment>
+      </UiLayer>
     </>
   );
 }
