@@ -286,3 +286,26 @@ Her faz: uygula → test/lint/build → tarayıcıda doğrula → `PROGRESS.md` 
 - HUD yenilendi; sürüş yardımcıları ve araca özel fizik ölçülebilir hedeflerle testli.
 - Vanta iç mekânı kokpit kamerasında detaylı.
 - `npm run lint`, `npm test`, `npm run build` yeşil; `PROGRESS.md` ve `ANALYSIS.md` güncel.
+
+---
+
+## 8. Sonraki geliştirme fikirleri (2026-11-02 incelemesi)
+
+Öncelik sırası; her satır bir sonraki tur için aday. Çoğu için tarayıcıda görsel doğrulama gerekir.
+
+| # | Konu | Değer | Maliyet | Not |
+| - | ---- | ----- | ------- | --- |
+| 1 | **Görsel doğrulama turu**: mobil düzen, iç mekân, kokpit, gece ışıkları (tüm hedef boyutlarda) | Çok yüksek | Düşük | Yazılı ama hiç görülmeyen çok iş var; önce bu |
+| 2 | **Motor sesi** (kullanıcı beğenmedi): planlı kaynak — temiz rev-up + rölanti + gaz kapama kaydı veya lisanslı paket; sentezi iyileştirme (harmonik zenginleştirme, gaz-kapama patlamaları) | Yüksek | Orta | Otomatik kesme denendi, yetmedi |
+| 3 | **Performans ölçümü** (araç × kalite) ve hedef GPU'da 60 FPS; çizim çağrısı bütçesi, mesh birleştirme, gölge/AO maliyeti | Yüksek | Orta | Mobilde ayrı bütçe |
+| 4 | **Sürüş hissi ayarı** oyuncu testiyle: drift kayma açısı/hız kaybı, ABS/TC eşikleri, araç başına profil; tuş/gamepad titreşimi | Yüksek | Orta | Sabitler `driving.json`, `drift.ts` |
+| 5 | **Oyun döngüsü**: kariyer/ekonomi (para, parça kilidi), zorluk seviyeli tur hedefleri, başarımlar | Yüksek | Yüksek | Tekrar oynanabilirliği asıl bu artırır |
+| 6 | **Yeni pistler** ve gün/gece + hava (yağmur: tutuş, ıslak yansıma); pist seçim ekranı | Yüksek | Yüksek | Pist verisi JSON, kod hazır |
+| 7 | **Rakipler / yapay zekâ** ve hayalet için gerçek araç modeli, çevrimiçi liderlik tablosu (isteğe bağlı sunucu) | Orta-Yüksek | Yüksek | Hayalet şimdilik mavi kutu |
+| 8 | **Hasar modeli** (çizik/göçük, kopan tampon) ve kaza kamerası | Orta | Yüksek | Spec §16 kapsam dışı |
+| 9 | **Fotoğraf modu** geliştirmeleri: çekim sonrası filtreler, galeri, paylaşım bağlantısı (build JSON kısa kod) | Orta | Düşük-Orta | PNG gömme hazır |
+| 10 | **Erişilebilirlik**: renk körü paleti, yazı ölçeği, tek elle oynanış, ses altyazısı yok → gösterge ölçeği | Orta | Düşük | Kısmen yapılabilir |
+| 11 | **Altyapı**: Playwright görsel regresyon, GitHub Actions'ta test + lint kapısı, CRLF/LF ve Prettier birliği (`.gitattributes`) | Orta | Düşük-Orta | Şimdi CRLF uyarıları var |
+| 12 | **Paket boyutu / yükleme**: sürüş kodu 1,7 MB, Rapier WASM tembel yükleme önbelleği, model ön yükleme, PWA (çevrimdışı) | Orta | Orta | Mobil için önemli |
+| 13 | **Mustang/BMW iç mekân** iyileştirmesi ve Vanta kabin ışığı (gece parlaması) | Düşük-Orta | Orta | V2-6'dan kalan |
+| 14 | **Gerçek cihaz testi** (iOS Safari, Android Chrome, gamepad): ses kilidi, Wake Lock, gyro yönü | Yüksek | Düşük | Elde cihaz gerekir |

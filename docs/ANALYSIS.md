@@ -45,6 +45,13 @@ Kabul ölçütleri (`npm run lint`, `npm test`, `npm run build`): hepsi yeşil �
 - **Vanta iç mekânı v2** ve kokpit kamerası; paylaşım görseli (PNG'ye gömülü build); kalıcı gün/gece.
 - **Testler:** 474 / 53 dosya. Açık: mobil/iç mekân görsel doğrulaması, kalite kademelerinde FPS ölçümü, Mustang iç mekânı, hava durumu, gerçek cihaz testi. Ayrıntı: `docs/PROGRESS.md`.
 
+## 1e. Güncelleme (2026-11-02, geri bildirim turu 3)
+
+- Gece far/stop lambaları yeniden yapıldı (ölçülmüş konumlar, parıltı, spot); gece ve kokpit görünürlüğü artırıldı (kokpitte camlar gizli).
+- HUD sadeleşti: lambalar varsayılan kapalı, pedal çubukları kaldırıldı; Ayarlar'a kontrol düzeni, lamba ve hayalet anahtarları eklendi.
+- Kayıtlı motor sesi denendi, beğenilmedi, geri alındı (sentez ses duruyor). Açık risk: motor sesi kalitesi.
+- Testler: 477 / 54 dosya.
+
 ## 2. Mimari
 
 - **Veri odaklı:** araç manifesti, parça kataloğu, boya/jant/duruş/performans/pist verileri JSON; kodda sihirli sayı yok (görsel ayarlar `sceneConfig`, `materialConfig`, fizik sabitleri adlandırılmış sabitlerde).

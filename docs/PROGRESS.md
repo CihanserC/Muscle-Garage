@@ -2,13 +2,24 @@
 
 ## Durum: Fazlar 0–11, V2-1…V2-3 ve V2-5 tamam; V2-4 kodu tamam (tarayıcıda doğrulanmadı); V2-6 kısmen — bkz. `docs/PLAN_V2.md`, `docs/ANALYSIS.md`
 
+## Kullanıcı geri bildirimi turu 3 — 2026-11-02
+
+**Yapıldı** (484 → 477 test: ses katmanı testleri geri alma ile gitti; lint, tür kontrolü, derleme yeşil)
+
+- **Gece far/stop lambaları** (`NightLights.tsx`, `data/cars/lights.ts`): eski spot ışık gövdenin içinde kalıyordu. Mustang (`fMAT_Lights1`) ve BMW (`LIGHTS`/`GLS_Red`) lamba materyal adalarının sınır kutularından konumlar ölçüldü; lens önünde parıltı (additive sprite), farlarda spot, stoplarda kızıl nokta ışık, frenle stop parlaması, kabinde küçük dolgu ışığı. Vanta için gövde uçlarından türetilir.
+- **Gece aydınlığı:** ay ışığı, gökyüzü, sis ve ortam yansıması belirgin parlatıldı (`driveLighting.ts`, `DriveEnvironment.tsx`). Değerler gözle ayarlanmadı.
+- **Kokpit kamerası:** camlar gizlenir (`mat_glass` ve modellerin cam materyalleri), yol cam filmiyle kararmasın. Sebebin bu olduğu doğrulanmadı.
+- **HUD sadeleşti:** ABS/TC/EF/drift lambaları varsayılan **kapalı** (Ayarlar'dan açılır); gaz/fren çubukları **kaldırıldı**. Nitro tüpünün altına "Shift" ipucu.
+- **Ayarlar:** "Kontroller" (Otomatik / Dokunmatik ekran / Klavye-gamepad), "Gösterge lambaları", "En iyi tur hayaleti" (`hudStore.ts`, kalıcı). Mobil HUD düzeni yalnız ekran kontrolleri açıkken uygulanır (`.dv-root.is-touch`); eskiden küçük pencere de tetikliyordu.
+- **Motor sesi denendi ve geri alındı:** Wikimedia Commons'tan CC BY 3.0 kayıtlar (BMW M3 GTR, Mustang GT S550/modifiye/Mach 1, 442, Duster, Chevelle, GT500) indirilip devir katmanlarına çevrildi; sonuç beğenilmedi, commit `83467f7` geri alındı (`26d5076`). Sentezlenmiş motor sesi geri geldi. Öğrenilenler: kayıtlar çoğunlukla rölanti/kısa rev, kararlı yüksek devir bölümü az; otomatik perde analiziyle devir tahmini güvenilmez. İyi sonuç için tek bir temiz "rev-up" kaydı + ayrı rölanti/yük kaydı gibi planlı kayıt ya da tek kaynaktan hazır lisanslı paket gerekir.
+
 ## V2-3 kalanları, V2-4 mobil, drift, V2-5 iç mekân, ek özellikler — 2026-11-02
 
 **Tamam, testli** (474 test; lint, tür kontrolü ve üretim derlemesi yeşil)
 
 - **ABS** (`assists.ts`): gövde kayma açısı ≈7°'yi aşınca fren kısılır (en fazla %45'e kadar); düz frenlemede ve el freninde dokunmaz. Ayrı boyuna kayma ölçümü olmadığı için yanal kaymaya göre çalışır. Başsız testler: virajda frenleme mesafesi ABS'siz ölçümün en fazla %5 fazlası, düz frenleme aynı (üç araç).
 - **Yardımcı ayarları** (`assistStore.ts`, kalıcı) Ayarlar penceresinde ve duraklat menüsünde. Varsayılan: TC kapalı, diğerleri açık.
-- **HUD:** gaz/fren çubukları, ABS/TC/HB lambaları, drift açısı, en iyi tura fark (100 dilimli geçiş tablosu, `lap.ts`).
+- **HUD:** ABS/TC/HB lambaları (sonradan varsayılan kapalı), drift açısı, en iyi tura fark (100 dilimli geçiş tablosu, `lap.ts`); gaz/fren çubukları sonradan kaldırıldı.
 - **Drift** (`core/drive/drift.ts`, `VehiclePhysics.applyDrift`): Space (el freni) + direksiyon, ≥ 29 km/s'de açılır. Direksiyon hedef kayma açısını seçer (tam kilitte ≈34°); yalpalama hızı bu açıyı tutar, hız vektörü gövdeye yalnız zayıf hizalanır, arka el freni kuvveti %20'ye iner. Ölçüm (3 araç, 80 km/s, tam direksiyon + %60 gaz): kayma açısı ≈28–30° sabit, hız 3 sn'de ≈70 → 50–57 km/s, devrilme yok; Space bırakılınca 0,5 sn içinde kayma 0°. Direksiyonsuz el freni eskisi gibi fren yapar. **Dokunmatikte** fren düğmesi + direksiyon hızlıyken drift'e çevrilir (`touchBrakeToDrift`).
 - **Mobil:** cihaz algılama, düşük başlangıç kalitesi, dpr ≤ 1,5, `viewport-fit`/safe-area/`100dvh`; dokunmatik sürüş kontrolleri; dikey uyarısı, Wake Lock, arka planda duraklat; `autoQuality` dokunmatik eşikleri (50 FPS altı, 3 ölçüm); vinil tutamaçları 2×; araç seçiminde yatay kaydırma; **eğim (gyro) direksiyonu** (Ayarlar: kapalı/açık/ters, iOS izni); iOS ses kilidi için `touchend`/`click`.
 - **V2-5 Vanta iç mekânı** (`src/car/interior/`): ekstrüde kıvrımlı torpido, kuvözlü ve canlı (hız/devir, 10 Hz) gösterge kümesi, orta konsol + vites kolu + el freni, döner direksiyon (3 kol), şekilli koltuklar + kafalık + arka bench, kapı panelleri (kol dayama, kapı kolu, cam kolu), tavan döşemesi, dikiz aynası, pedallar, halı. Üçgen bütçesi testle korunur (< 40 bin; gerçek ≈ birkaç bin). Yakından detay, 7 m'den uzakta küçük parçalar gizlenir (LOD). **Kokpit kamerası** (C ile döngüde 5. kamera): sürücü gözü, yanal harekete bağlı hafif baş sallanması.
