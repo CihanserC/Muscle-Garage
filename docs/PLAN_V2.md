@@ -293,6 +293,8 @@ Her faz: uygula → test/lint/build → tarayıcıda doğrula → `PROGRESS.md` 
 
 Durum (aynı gün): #2 yalnız sentez iyileştirmesi, #3 yalnız model bütçesi testi, #4 yalnız gamepad titreşimi, #9 paylaşım kodu, #10 HUD boyutu, #11 CI testi + Prettier ayarı yapıldı. #1, #14 (tarayıcı/cihaz yok) ve #5–#8, #12, #13 açık. Ayrıntı: `docs/PROGRESS.md`.
 
+Açık işler GitHub issue'larına taşındı (katkıya açık): dil ekleme (#1), boya renkleri (#2), iOS testi (#3), PWA (#4), erişilebilirlik (#5), BMW sadeleştirme (#6), Mustang/BMW iç mekân (#7), yeni pist + hava (#8), FPS ölçümü (#9), motor sesi (#10). Katkı rehberi: `CONTRIBUTING.md`.
+
 Öncelik sırası; her satır bir sonraki tur için aday. Çoğu için tarayıcıda görsel doğrulama gerekir.
 
 | # | Konu | Değer | Maliyet | Not |
