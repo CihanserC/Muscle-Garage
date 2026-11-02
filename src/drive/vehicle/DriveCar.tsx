@@ -161,6 +161,9 @@ export function DriveCar({
     const wake = () => audio.current?.resume();
     window.addEventListener('keydown', wake);
     window.addEventListener('pointerdown', wake);
+    // iOS Safari ses kilidini yalnız touchend / click ile açar
+    window.addEventListener('touchend', wake);
+    window.addEventListener('click', wake);
     if (import.meta.env.DEV) {
       const dbg: DriveDebug = { input: source, physics: null };
       Object.defineProperty(dbg, 'physics', { get: () => physics.current });
@@ -169,6 +172,8 @@ export function DriveCar({
     return () => {
       window.removeEventListener('keydown', wake);
       window.removeEventListener('pointerdown', wake);
+      window.removeEventListener('touchend', wake);
+      window.removeEventListener('click', wake);
       source.dispose();
       input.current = null;
     };

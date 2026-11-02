@@ -1,12 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  emptySplits,
-  formatDelta,
-  lapDelta,
-  lapFraction,
-  recordSplit,
-  SPLIT_BINS,
-} from './lap';
+import { emptySplits, formatDelta, lapDelta, lapFraction, recordSplit, SPLIT_BINS } from './lap';
 
 describe('tur dilimleri', () => {
   it('ilerleme oranı çizginin gerisinde de 0..1 kalır', () => {

@@ -111,11 +111,7 @@ export function recordSplit(splits: LapSplits, fraction: number, elapsed: number
  * En iyi tura göre fark (sn): pozitif = en iyi turdan yavaş. Kayıtlı en iyi tur ya da o dilim
  * yoksa null.
  */
-export function lapDelta(
-  best: LapSplits | null,
-  fraction: number,
-  elapsed: number,
-): number | null {
+export function lapDelta(best: LapSplits | null, fraction: number, elapsed: number): number | null {
   if (!best) return null;
   const bin = Math.min(SPLIT_BINS - 1, Math.floor(fraction * SPLIT_BINS));
   const ref = best[bin];
